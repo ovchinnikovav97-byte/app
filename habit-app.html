@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Мягкий трекер — привычки, движение, питание, сон</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=Lora:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FBF6F2;
+    --bg-card: #FFFDFB;
+    --bg-soft: #F4DEDA;
+    --bg-soft-2: #F0E6DE;
+    --accent: #6B2E3A;
+    --accent-2: #8A4152;
+    --accent-tint: #F4DEDA;
+    --text: #3A2E2E;
+    --text-muted: #8C7A78;
+    --border: #EAD9D2;
+    --radius-lg: 22px;
+    --radius-md: 16px;
+    --radius-sm: 10px;
+    --shadow: 0 4px 18px rgba(107,46,58,0.06);
+  }
+  [data-theme="dark"] {
+    --bg: #26191C;
+    --bg-card: #2F2124;
+    --bg-soft: #3B282C;
+    --bg-soft-2: #3B282C;
+    --accent: #E8A2AE;
+    --accent-2: #D98A98;
+    --accent-tint: #3B282C;
+    --text: #F3E9E7;
+    --text-muted: #B8A29F;
+    --border: #453034;
+    --shadow: 0 4px 18px rgba(0,0,0,0.25);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Golos Text', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    transition: background .3s ease, color .3s ease;
+  }
+  h1, h2, h3, .serif { font-family: 'Lora', serif; }
+  button { font-family: inherit; }
+  #app {
+    max-width: 480px;
+    margin: 0 auto;
+    min-height: 100vh;
+    padding-bottom: 90px;
+    position: relative;
+  }
+  .screen { padding: 20px 20px 8px; animation: fadeIn .35s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px);} to { opacity: 1; transform: translateY(0);} }
+
+  /* ---- Generic elements ---- */
+  .eyebrow { font-size: 13px; color: var(--text-muted); letter-spacing: .02em; margin: 0 0 4px; }
+  .title-lg { font-size: 26px; font-weight: 600; margin: 0 0 6px; line-height: 1.25; }
+  .title-md { font-size: 19px; font-weight: 600; margin: 0 0 10px; }
+  .subtitle { color: var(--text-muted); font-size: 14.5px; line-height: 1.5; margin: 0 0 20px; }
+
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    padding: 18px;
+    margin-bottom: 14px;
+  }
+  .card-soft {
+    background: var(--bg-soft);
+    border-radius: var(--radius-lg);
+    padding: 18px;
+    margin-bottom: 14px;
+  }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    border: none; border-radius: 999px;
+    padding: 14px 22px;
+    font-size: 15px; font-weight: 600;
+    cursor: pointer;
+    transition: transform .15s ease, opacity .15s ease;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { opacity: .92; }
+  .btn-ghost { background: transparent; color: var(--accent); border: 1.5px solid var(--border); }
+  .btn-block { width: 100%; }
+  .btn-sm { padding: 9px 16px; font-size: 13.5px; }
+  .btn-icon { width: 42px; height: 42px; border-radius: 50%; background: var(--bg-soft); color: var(--accent); border: none; display:flex; align-items:center; justify-content:center; font-size: 18px; cursor:pointer; }
+
+  .row { display: flex; align-items: center; }
+  .row-between { display: flex; align-items: center; justify-content: space-between; }
+  .gap-8 { gap: 8px; }
+  .gap-12 { gap: 12px; }
+
+  /* ---- Chips ---- */
+  .chip-grid { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0 6px; }
+  .chip {
+    padding: 10px 16px;
+    border-radius: 999px;
+    border: 1.5px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text);
+    font-size: 14.5px;
+    cursor: pointer;
+    user-select: none;
+    transition: all .15s ease;
+  }
+  .chip.selected {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+
+  /* ---- Toggle ---- */
+  .toggle {
+    width: 46px; height: 27px; border-radius: 999px;
+    background: var(--border); position: relative; cursor: pointer; flex-shrink: 0;
+    transition: background .2s ease;
+  }
+  .toggle.on { background: var(--accent); }
+  .toggle .knob {
+    position: absolute; top: 3px; left: 3px;
+    width: 21px; height: 21px; border-radius: 50%;
+    background: #fff; transition: left .2s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  .toggle.on .knob { left: 22px; }
+
+  /* ---- Onboarding shell ---- */
+  .onb-progress { display:flex; gap: 6px; padding: 18px 20px 0; }
+  .onb-progress .seg { flex:1; height: 4px; border-radius: 4px; background: var(--border); }
+  .onb-progress .seg.done { background: var(--accent); }
+  .onb-nav { display:flex; gap: 10px; margin-top: 22px; }
+
+  input[type="text"], input[type="number"], select, textarea {
+    width: 100%; padding: 12px 14px; border-radius: var(--radius-sm);
+    border: 1.5px solid var(--border); background: var(--bg-card); color: var(--text);
+    font-family: inherit; font-size: 14.5px; margin-top: 6px;
+  }
+  input[type="time"] {
+    padding: 10px 12px; border-radius: var(--radius-sm); border: 1.5px solid var(--border);
+    background: var(--bg-card); color: var(--text); font-family: inherit; font-size: 15px;
+  }
+  input[type="range"] { width: 100%; accent-color: var(--accent); }
+  label.field-label { font-size: 13.5px; color: var(--text-muted); display:block; margin-top: 14px; }
+
+  /* ---- Bottom nav ---- */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 480px;
+    background: var(--bg-card); border-top: 1px solid var(--border);
+    display: flex; padding: 8px 6px calc(8px + env(safe-area-inset-bottom));
+    z-index: 20;
+  }
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+    padding: 6px 2px; border-radius: 12px; cursor: pointer; color: var(--text-muted);
+    font-size: 11px; background: none; border: none; font-family: inherit;
+  }
+  .nav-item.active { color: var(--accent); }
+  .nav-item .ic { font-size: 20px; }
+
+  /* ---- Habit row ---- */
+  .habit-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 4px; border-bottom: 1px solid var(--border);
+  }
+  .habit-row:last-child { border-bottom: none; }
+  .check-circle {
+    width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+    border: 2px solid var(--border); display:flex; align-items:center; justify-content:center;
+    cursor: pointer; font-size: 15px; color: #fff; transition: all .15s ease;
+  }
+  .check-circle.done { background: var(--accent); border-color: var(--accent); }
+  .habit-name { font-weight: 500; font-size: 15px; }
+  .habit-meta { font-size: 12.5px; color: var(--text-muted); margin-top: 1px; }
+
+  .heat-row { display: flex; gap: 5px; margin-top: 6px; }
+  .heat-dot { width: 18px; height: 18px; border-radius: 6px; background: var(--border); }
+  .heat-dot.on { background: var(--accent); }
+
+  /* ---- Recipe grid ---- */
+  .recipe-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 8px; }
+  .recipe-card {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md);
+    overflow: hidden; cursor: pointer; box-shadow: var(--shadow);
+  }
+  .recipe-img { height: 92px; display:flex; align-items:center; justify-content:center; font-size: 40px; background: var(--bg-soft); }
+  .recipe-info { padding: 10px 12px 12px; }
+  .recipe-title { font-size: 14px; font-weight: 600; margin: 0 0 2px; }
+  .recipe-time { font-size: 12px; color: var(--text-muted); }
+
+  .ingredient-row { display:flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed var(--border); font-size: 14px; }
+  .ingredient-row:last-child { border-bottom: none; }
+  .step-item { display: flex; gap: 10px; margin-bottom: 14px; align-items: flex-start; }
+  .step-num {
+    width: 26px; height: 26px; border-radius: 50%; background: var(--bg-soft); color: var(--accent);
+    display:flex; align-items:center; justify-content:center; font-size: 12.5px; font-weight: 700; flex-shrink:0;
+  }
+
+  .encourage-banner {
+    background: var(--bg-soft); border-radius: var(--radius-lg);
+    padding: 16px 18px; margin-bottom: 16px; font-size: 14.5px; line-height: 1.5;
+  }
+  .encourage-banner .em { font-size: 20px; margin-right: 6px; }
+
+  .top-bar { display:flex; align-items:center; justify-content: space-between; margin-bottom: 4px; }
+  .top-bar h1 { margin: 0; }
+
+  .settings-item {
+    display:flex; align-items:center; justify-content: space-between;
+    padding: 14px 4px; border-bottom: 1px solid var(--border); cursor: pointer;
+  }
+  .settings-item:last-child { border-bottom: none; }
+  .settings-item .lbl { font-size: 15px; font-weight: 500; }
+  .settings-item .val { font-size: 13px; color: var(--text-muted); }
+
+  ::selection { background: var(--accent-tint); }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* =========================================================
+   ДАННЫЕ / КОНФИГ
+========================================================= */
+const STORAGE_KEY = 'soft_tracker_v1';
+
+const PRESET_HABITS = [
+  {id:'water', label:'Вода'},
+  {id:'vitamins', label:'Витамины'},
+  {id:'stretch', label:'Растяжка'},
+  {id:'reading', label:'Чтение'},
+  {id:'breathing', label:'Дыхательные практики'},
+  {id:'screentime', label:'Меньше экрана перед сном'},
+  {id:'journaling', label:'Дневник / благодарности'},
+  {id:'skincare', label:'Уход за собой'},
+];
+
+const PRESET_MOVEMENT = [
+  {id:'pilates', label:'Пилатес'},
+  {id:'yoga', label:'Йога'},
+  {id:'dance', label:'Танцы'},
+  {id:'walk', label:'Ходьба'},
+  {id:'run', label:'Бег'},
+  {id:'strength', label:'Силовая'},
+];
+
+const HARDEST_OPTIONS = [
+  {id:'nutrition', label:'Питание'},
+  {id:'movement', label:'Движение'},
+  {id:'sleep', label:'Сон'},
+  {id:'habits', label:'Привычки'},
+];
+
+const RECIPES = [
+  {
+    id:'oats', title:'Овсянка с ягодами и мёдом', time:'10 мин', emoji:'🥣',
+    ingredients:[
+      {name:'Овсяные хлопья', grams:'60 г'},
+      {name:'Молоко или растительный напиток', grams:'200 мл'},
+      {name:'Ягоды (свежие или замороженные)', grams:'80 г'},
+      {name:'Мёд', grams:'1 ст. ложка'},
+      {name:'Щепотка корицы', grams:'по вкусу'},
+    ],
+    steps:[
+      'Довести молоко до кипения на среднем огне.',
+      'Всыпать овсяные хлопья, убавить огонь и варить 5–7 минут, помешивая.',
+      'Снять с огня, разложить по тарелке.',
+      'Сверху выложить ягоды, полить мёдом и присыпать корицей.',
+    ],
+  },
+  {
+    id:'quinoa', title:'Салат с киноа и овощами', time:'20 мин', emoji:'🥗',
+    ingredients:[
+      {name:'Киноа (сухая)', grams:'100 г'},
+      {name:'Огурец', grams:'1 шт.'},
+      {name:'Помидоры черри', grams:'100 г'},
+      {name:'Оливковое масло', grams:'2 ст. ложки'},
+      {name:'Лимонный сок', grams:'1 ст. ложка'},
+      {name:'Соль, зелень', grams:'по вкусу'},
+    ],
+    steps:[
+      'Отварить киноа в подсоленной воде 12–15 минут, остудить.',
+      'Нарезать огурец и помидоры небольшими кубиками.',
+      'Смешать киноа с овощами.',
+      'Заправить маслом и лимонным соком, посолить, добавить зелень.',
+    ],
+  },
+  {
+    id:'bowl', title:'Тёплый боул с курицей и овощами', time:'30 мин', emoji:'🍲',
+    ingredients:[
+      {name:'Куриное филе', grams:'150 г'},
+      {name:'Бурый рис', grams:'70 г'},
+      {name:'Брокколи', grams:'100 г'},
+      {name:'Морковь', grams:'1 шт.'},
+      {name:'Соевый соус', grams:'1 ст. ложка'},
+      {name:'Растительное масло', grams:'1 ст. ложка'},
+    ],
+    steps:[
+      'Отварить рис по инструкции на упаковке.',
+      'Курицу нарезать полосками, обжарить на масле 6–8 минут.',
+      'Брокколи и морковь бланшировать или обжарить 4–5 минут.',
+      'Собрать боул: рис, курица, овощи, сверху сбрызнуть соевым соусом.',
+    ],
+  },
+  {
+    id:'smoothie', title:'Смузи с бананом и шпинатом', time:'5 мин', emoji:'🥤',
+    ingredients:[
+      {name:'Банан', grams:'1 шт.'},
+      {name:'Шпинат свежий', grams:'30 г'},
+      {name:'Растительное молоко', grams:'200 мл'},
+      {name:'Семена чиа (по желанию)', grams:'1 ч. ложка'},
+    ],
+    steps:[
+      'Сложить все ингредиенты в блендер.',
+      'Взбить до однородности 40–60 секунд.',
+      'Перелить в стакан и выпить сразу же.',
+    ],
+  },
+  {
+    id:'pasta', title:'Паста с песто и помидорами', time:'15 мин', emoji:'🍝',
+    ingredients:[
+      {name:'Паста', grams:'90 г'},
+      {name:'Соус песто', grams:'2 ст. ложки'},
+      {name:'Помидоры черри', grams:'80 г'},
+      {name:'Пармезан', grams:'15 г'},
+    ],
+    steps:[
+      'Отварить пасту в подсоленной воде согласно инструкции.',
+      'Слить воду, оставив немного для соуса.',
+      'Смешать пасту с песто, добавить разрезанные помидоры.',
+      'Подавать, натерев сверху пармезан.',
+    ],
+  },
+  {
+    id:'salmon', title:'Запечённый лосось с овощами', time:'25 мин', emoji:'🐟',
+    ingredients:[
+      {name:'Филе лосося', grams:'150 г'},
+      {name:'Цукини', grams:'1 шт.'},
+      {name:'Болгарский перец', grams:'1 шт.'},
+      {name:'Оливковое масло', grams:'1 ст. ложка'},
+      {name:'Лимон', grams:'2 дольки'},
+      {name:'Соль, перец', grams:'по вкусу'},
+    ],
+    steps:[
+      'Разогреть духовку до 200°C.',
+      'Овощи нарезать крупными кусочками, выложить на противень с маслом.',
+      'Сверху уложить лосось, посолить, поперчить, добавить дольки лимона.',
+      'Запекать 18–20 минут до готовности.',
+    ],
+  },
+];
+
+const TONE_MESSAGES = {
+  soft: {
+    doneHabit: ['Умница, что нашла на это время 🤍', 'Маленький шаг — и он уже засчитан.', 'Отлично, ты держишь свой ритм.'],
+    skip: ['Пропущенный день — это нормально, продолжим с завтрашнего 🤍', 'Ничего страшного, ты всё ещё на своём пути.'],
+    hardestSkip: ['Знаю, это самое сложное для тебя — и ты всё равно здесь. Уже хорошо 🤍', 'Не получилось сегодня — и это ок. Завтра новый день.'],
+  },
+  strict: {
+    doneHabit: ['Сделано. Так держать.', 'Отметила — двигаемся дальше.', 'Хороший результат, не останавливайся.'],
+    skip: ['Пропуск замечен — постарайся вернуться в ритм завтра.', 'Сегодня не получилось. Возвращаемся завтра.'],
+    hardestSkip: ['Это твоя самая сложная зона — и день пропущен. Просто продолжай завтра, без драмы.', 'Заметили пропуск в сложной для тебя области. Идём дальше.'],
+  },
+};
+
+/* =========================================================
+   СОСТОЯНИЕ
+========================================================= */
+function defaultState() {
+  return {
+    onboarded: false,
+    onboardStep: 0,
+    screen: 'dashboard',
+    darkMode: false,
+
+    habits: [],           // {id, label, freq}
+    habitLogs: {},        // { 'YYYY-MM-DD': { habitId: true } }
+
+    movementTypes: [],    // [id,...]
+    trackSteps: false,
+    movementLogs: {},     // { 'YYYY-MM-DD': { types: [id,...], steps: n } }
+
+    nutritionEnabled: true,
+    nutritionStyle: '',
+    recipeCookedLog: {},  // { recipeId: true }
+    customRecipes: [],    // [{id, title, emoji, ingredients:[{name,grams}], steps:[...]}]
+
+    sleepEnabled: true,
+    sleepGoalHours: 8,
+    bedtimeGoal: '23:00',
+    sleepLogs: {},         // { 'YYYY-MM-DD': {bedtime, wake, quality, note} }
+
+    tone: 'soft',
+    hardestArea: 'nutrition',
+  };
+}
+
+let state = load();
+
+function load() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return defaultState();
+    const parsed = JSON.parse(raw);
+    return Object.assign(defaultState(), parsed);
+  } catch (e) {
+    return defaultState();
+  }
+}
+function save() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
+}
+function todayKey() {
+  const d = new Date();
+  return d.toISOString().slice(0,10);
+}
+function dateKeyOffset(offset) {
+  const d = new Date();
+  d.setDate(d.getDate() + offset);
+  return d.toISOString().slice(0,10);
+}
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function applyTheme() {
+  document.documentElement.setAttribute('data-theme', state.darkMode ? 'dark' : 'light');
+}
+
+/* =========================================================
+   РЕНДЕР — ГЛАВНЫЙ ДИСПЕТЧЕР
+========================================================= */
+function render() {
+  applyTheme();
+  const app = document.getElementById('app');
+  if (!state.onboarded) {
+    app.innerHTML = renderOnboarding();
+  } else {
+    let content = '';
+    switch (state.screen) {
+      case 'dashboard': content = renderDashboard(); break;
+      case 'habits': content = renderHabits(); break;
+      case 'movement': content = renderMovement(); break;
+      case 'nutrition': content = renderNutrition(); break;
+      case 'recipe': content = renderRecipeDetail(); break;
+      case 'addRecipe': content = renderAddRecipe(); break;
+      case 'sleep': content = renderSleep(); break;
+      case 'settings': content = renderSettings(); break;
+      default: content = renderDashboard();
+    }
+    app.innerHTML = content + renderBottomNav();
+  }
+  window.scrollTo(0,0);
+}
+
+function go(screen) { state.screen = screen; save(); render(); }
+
+/* =========================================================
+   ОНБОРДИНГ
+========================================================= */
+function onbProgress() {
+  const total = 6;
+  let segs = '';
+  for (let i=0;i<total;i++){
+    segs += `<div class="seg ${i < state.onboardStep ? 'done':''}"></div>`;
+  }
+  return `<div class="onb-progress">${segs}</div>`;
+}
+
+function renderOnboarding() {
+  const step = state.onboardStep;
+  let body = '';
+  if (step === 0) body = onbWelcome();
+  else if (step === 1) body = onbHabits();
+  else if (step === 2) body = onbMovement();
+  else if (step === 3) body = onbNutrition();
+  else if (step === 4) body = onbSleep();
+  else if (step === 5) body = onbTone();
+  else if (step === 6) body = onbAppearance();
+  else if (step === 7) body = onbSummary();
+
+  const showProgress = step >= 1 && step <= 6;
+  return `${showProgress ? onbProgress() : ''}<div class="screen">${body}</div>`;
+}
+
+function onbWelcome() {
+  return `
+    <div style="min-height:78vh; display:flex; flex-direction:column; justify-content:center; text-align:center;">
+      <div style="font-size:44px; margin-bottom:14px;">🤍</div>
+      <h1 class="title-lg serif">Мягкий трекер</h1>
+      <p class="subtitle">Привычки, движение, питание и сон — настроенные под тебя, без чувства вины за пропущенный день.</p>
+      <button class="btn btn-primary btn-block" onclick="onbNext()">Начать настройку</button>
+      <p style="color:var(--text-muted); font-size:12.5px; margin-top:32px;">by @ovvictory_</p>
+    </div>`;
+}
+
+function onbHabits() {
+  const selected = state.habits.map(h => h.id);
+  const chips = PRESET_HABITS.map(h => `
+    <div class="chip ${selected.includes(h.id) ? 'selected':''}" onclick="toggleOnbHabit('${h.id}','${h.label}')">${h.label}</div>
+  `).join('');
+  return `
+    <p class="eyebrow">Шаг 1 из 6</p>
+    <h2 class="title-md serif">Какие привычки хочешь отслеживать?</h2>
+    <p class="subtitle">Выбери сколько угодно — можно поменять позже в настройках.</p>
+    <div class="chip-grid">${chips}</div>
+    <label class="field-label">Своя привычка</label>
+    <div class="row gap-8" style="margin-top:6px;">
+      <input type="text" id="customHabitInput" placeholder="Например, растяжка спины">
+      <button class="btn-icon" onclick="addCustomHabit()">+</button>
+    </div>
+    ${onbNavButtons(1)}
+  `;
+}
+
+function toggleOnbHabit(id, label) {
+  const idx = state.habits.findIndex(h => h.id === id);
+  if (idx >= 0) state.habits.splice(idx, 1);
+  else state.habits.push({id, label, freq:'daily'});
+  save(); render();
+}
+function addCustomHabit() {
+  const input = document.getElementById('customHabitInput');
+  const val = input.value.trim();
+  if (!val) return;
+  const id = 'custom_' + Date.now();
+  state.habits.push({id, label: val, freq:'daily'});
+  save(); render();
+}
+
+function onbMovement() {
+  const selected = state.movementTypes;
+  const chips = PRESET_MOVEMENT.map(m => `
+    <div class="chip ${selected.includes(m.id) ? 'selected':''}" onclick="toggleOnbMovement('${m.id}')">${m.label}</div>
+  `).join('');
+  return `
+    <p class="eyebrow">Шаг 2 из 6</p>
+    <h2 class="title-md serif">Как ты двигаешься?</h2>
+    <p class="subtitle">Отметь всё, что подходит.</p>
+    <div class="chip-grid">${chips}</div>
+    <div class="card-soft" style="margin-top:18px;">
+      <div class="row-between">
+        <span style="font-weight:500;">Считать шаги за день</span>
+        <div class="toggle ${state.trackSteps ? 'on':''}" onclick="toggleSteps()"><div class="knob"></div></div>
+      </div>
+    </div>
+    ${onbNavButtons(2)}
+  `;
+}
+function toggleOnbMovement(id) {
+  const idx = state.movementTypes.indexOf(id);
+  if (idx >= 0) state.movementTypes.splice(idx,1);
+  else state.movementTypes.push(id);
+  save(); render();
+}
+function toggleSteps() { state.trackSteps = !state.trackSteps; save(); render(); }
+
+function onbNutrition() {
+  return `
+    <p class="eyebrow">Шаг 3 из 6</p>
+    <h2 class="title-md serif">Раздел питания</h2>
+    <p class="subtitle">Подробные рецепты с граммовками — нужны?</p>
+    <div class="card-soft">
+      <div class="row-between">
+        <span style="font-weight:500;">Включить раздел питания</span>
+        <div class="toggle ${state.nutritionEnabled ? 'on':''}" onclick="toggleNutrition()"><div class="knob"></div></div>
+      </div>
+    </div>
+    ${state.nutritionEnabled ? `
+      <label class="field-label">Какой стиль ближе?</label>
+      <div class="chip-grid">
+        ${['Обычная кухня','Особый протокол/диета','Простые быстрые блюда'].map(s => `
+          <div class="chip ${state.nutritionStyle===s?'selected':''}" onclick="setNutritionStyle('${s}')">${s}</div>
+        `).join('')}
+      </div>
+    `: ''}
+    ${onbNavButtons(3)}
+  `;
+}
+function toggleNutrition() { state.nutritionEnabled = !state.nutritionEnabled; save(); render(); }
+function setNutritionStyle(s) { state.nutritionStyle = s; save(); render(); }
+
+function onbSleep() {
+  return `
+    <p class="eyebrow">Шаг 4 из 6</p>
+    <h2 class="title-md serif">Сон</h2>
+    <p class="subtitle">Хочешь отслеживать режим сна?</p>
+    <div class="card-soft">
+      <div class="row-between">
+        <span style="font-weight:500;">Включить раздел сна</span>
+        <div class="toggle ${state.sleepEnabled ? 'on':''}" onclick="toggleSleep()"><div class="knob"></div></div>
+      </div>
+    </div>
+    ${state.sleepEnabled ? `
+      <label class="field-label">Желаемое время отбоя</label>
+      <input type="time" value="${state.bedtimeGoal}" onchange="setBedtimeGoal(this.value)">
+      <label class="field-label">Целевая длительность сна: <b>${state.sleepGoalHours} ч</b></label>
+      <input type="range" min="5" max="10" step="0.5" value="${state.sleepGoalHours}" oninput="setSleepGoal(this.value)">
+    ` : ''}
+    ${onbNavButtons(4)}
+  `;
+}
+function toggleSleep() { state.sleepEnabled = !state.sleepEnabled; save(); render(); }
+function setBedtimeGoal(v) { state.bedtimeGoal = v; save(); }
+function setSleepGoal(v) { state.sleepGoalHours = v; save(); render(); }
+
+function onbTone() {
+  const hardestChips = HARDEST_OPTIONS.map(h => `
+    <div class="chip ${state.hardestArea===h.id?'selected':''}" onclick="setHardest('${h.id}')">${h.label}</div>
+  `).join('');
+  return `
+    <p class="eyebrow">Шаг 5 из 6</p>
+    <h2 class="title-md serif">Тон и поддержка</h2>
+    <p class="subtitle">Как с тобой лучше разговаривать?</p>
+    <div class="row gap-12" style="margin: 14px 0;">
+      <div class="card" style="flex:1; cursor:pointer; ${state.tone==='soft' ? 'border-color:var(--accent); border-width:2px;':''}" onclick="setTone('soft')">
+        <div style="font-size:22px;">🤍</div>
+        <div style="font-weight:600; margin-top:6px;">Мягкий</div>
+        <div style="font-size:12.5px; color:var(--text-muted); margin-top:2px;">Поддержка, без давления</div>
+      </div>
+      <div class="card" style="flex:1; cursor:pointer; ${state.tone==='strict' ? 'border-color:var(--accent); border-width:2px;':''}" onclick="setTone('strict')">
+        <div style="font-size:22px;">🎯</div>
+        <div style="font-weight:600; margin-top:6px;">Строгий</div>
+        <div style="font-size:12.5px; color:var(--text-muted); margin-top:2px;">Чётко, по делу</div>
+      </div>
+    </div>
+    <label class="field-label">Что тебе, скорее всего, будет даваться тяжелее всего?</label>
+    <div class="chip-grid">${hardestChips}</div>
+    <p style="font-size:12.5px; color:var(--text-muted); margin-top:8px;">В такие дни приложение будет особенно бережным, а не критикующим.</p>
+    ${onbNavButtons(5)}
+  `;
+}
+function setTone(t) { state.tone = t; save(); render(); }
+function setHardest(id) { state.hardestArea = id; save(); render(); }
+
+function onbAppearance() {
+  return `
+    <p class="eyebrow">Шаг 6 из 6</p>
+    <h2 class="title-md serif">Внешний вид</h2>
+    <p class="subtitle">Мягкий минимализм с бордовыми акцентами — выбери светлую или тёмную версию.</p>
+    <div class="row gap-12" style="margin: 14px 0;">
+      <div class="card" style="flex:1; cursor:pointer; ${!state.darkMode ? 'border-color:var(--accent); border-width:2px;':''}" onclick="setDarkPreview(false)">
+        <div style="font-size:22px;">☀️</div>
+        <div style="font-weight:600; margin-top:6px;">Светлая</div>
+      </div>
+      <div class="card" style="flex:1; cursor:pointer; ${state.darkMode ? 'border-color:var(--accent); border-width:2px;':''}" onclick="setDarkPreview(true)">
+        <div style="font-size:22px;">🌙</div>
+        <div style="font-weight:600; margin-top:6px;">Тёмная</div>
+      </div>
+    </div>
+    ${onbNavButtons(6)}
+  `;
+}
+function setDarkPreview(v) { state.darkMode = v; save(); render(); }
+
+function onbSummary() {
+  const habitList = state.habits.map(h => h.label).join(', ') || '—';
+  const movementList = state.movementTypes.map(id => (PRESET_MOVEMENT.find(m=>m.id===id)||{}).label).join(', ') || '—';
+  return `
+    <div style="text-align:center; margin-bottom:10px;">
+      <div style="font-size:38px;">🤍</div>
+      <h1 class="title-lg serif">Вот твой личный план</h1>
+    </div>
+    <div class="card">
+      <div class="settings-item"><span class="lbl">Привычки</span><span class="val" style="text-align:right; max-width:60%;">${habitList}</span></div>
+      <div class="settings-item"><span class="lbl">Движение</span><span class="val" style="text-align:right; max-width:60%;">${movementList}</span></div>
+      <div class="settings-item"><span class="lbl">Шаги</span><span class="val">${state.trackSteps ? 'Считаем' : 'Не считаем'}</span></div>
+      <div class="settings-item"><span class="lbl">Питание</span><span class="val">${state.nutritionEnabled ? (state.nutritionStyle || 'Включено') : 'Выключено'}</span></div>
+      <div class="settings-item"><span class="lbl">Сон</span><span class="val">${state.sleepEnabled ? state.sleepGoalHours + ' ч, отбой ' + state.bedtimeGoal : 'Выключено'}</span></div>
+      <div class="settings-item"><span class="lbl">Тон</span><span class="val">${state.tone === 'soft' ? 'Мягкий' : 'Строгий'}</span></div>
+    </div>
+    <button class="btn btn-primary btn-block" onclick="finishOnboarding()">Начать пользоваться 🤍</button>
+    <button class="btn btn-ghost btn-block" style="margin-top:10px;" onclick="onbBack()">Изменить что-то</button>
+  `;
+}
+
+function onbNavButtons(stepIndex) {
+  return `
+    <div class="onb-nav">
+      ${stepIndex > 0 ? `<button class="btn btn-ghost" onclick="onbBack()">Назад</button>` : ''}
+      <button class="btn btn-primary" style="flex:1;" onclick="onbNext()">Далее</button>
+    </div>
+  `;
+}
+function onbNext() { state.onboardStep += 1; save(); render(); }
+function onbBack() { state.onboardStep = Math.max(0, state.onboardStep - 1); save(); render(); }
+function finishOnboarding() {
+  state.onboarded = true;
+  state.screen = 'dashboard';
+  save(); render();
+}
+
+/* =========================================================
+   ПОДДЕРЖКА / СООБЩЕНИЯ
+========================================================= */
+function getEncourageMessage() {
+  const t = state.tone === 'strict' ? 'strict' : 'soft';
+  const todaysHabits = state.habits;
+  const log = state.habitLogs[todayKey()] || {};
+  const doneCount = todaysHabits.filter(h => log[h.id]).length;
+  const hardestLabel = (HARDEST_OPTIONS.find(h=>h.id===state.hardestArea)||{}).label || '';
+
+  if (todaysHabits.length === 0) {
+    return { emoji:'🤍', text: 'Начни с малого — отметь первую привычку сегодня.' };
+  }
+  if (doneCount === todaysHabits.length) {
+    return { emoji:'✨', text: pick(TONE_MESSAGES[t].doneHabit) };
+  }
+  if (doneCount === 0) {
+    // check if it's late in the day-ish; just show gentle nudge tied to hardest area sometimes
+    if (Math.random() < 0.4 && hardestLabel) {
+      return { emoji:'🤍', text: pick(TONE_MESSAGES[t].hardestSkip) };
+    }
+    return { emoji:'🤍', text: pick(TONE_MESSAGES[t].skip) };
+  }
+  return { emoji:'🌿', text: `Уже отмечено ${doneCount} из ${todaysHabits.length} — продолжаем.` };
+}
+
+/* =========================================================
+   DASHBOARD
+========================================================= */
+function renderDashboard() {
+  const hour = new Date().getHours();
+  const greeting = hour < 6 ? 'Доброй ночи' : hour < 12 ? 'Доброе утро' : hour < 18 ? 'Добрый день' : 'Добрый вечер';
+  const msg = getEncourageMessage();
+  const log = state.habitLogs[todayKey()] || {};
+  const habitsPreview = state.habits.slice(0,4).map(h => `
+    <div class="habit-row">
+      <div class="check-circle ${log[h.id] ? 'done':''}" onclick="toggleHabitLog('${h.id}')">${log[h.id] ? '✓' : ''}</div>
+      <div><div class="habit-name">${h.label}</div></div>
+    </div>
+  `).join('') || `<p class="subtitle">Пока нет привычек — добавь их в настройках.</p>`;
+
+  const mLog = (state.movementLogs[todayKey()] || {types:[], steps:0});
+  const stepsLine = state.trackSteps ? `<div class="habit-meta">Шаги сегодня: ${mLog.steps || 0}</div>` : '';
+
+  const sLog = state.sleepLogs[todayKey()];
+  const sleepLine = state.sleepEnabled
+    ? (sLog ? `Качество сна: ${sLog.quality}/5` : 'Сон за сегодня ещё не отмечен')
+    : '';
+
+  return `
+    <div class="screen">
+      <div class="top-bar">
+        <h1 class="title-lg serif">${greeting} 🤍</h1>
+        <button class="btn-icon" onclick="go('settings')">⚙️</button>
+      </div>
+      <div class="encourage-banner"><span class="em">${msg.emoji}</span>${msg.text}</div>
+
+      <div class="card">
+        <div class="row-between" style="margin-bottom:6px;">
+          <h3 class="title-md" style="margin:0;">Сегодняшние привычки</h3>
+          <span style="font-size:12.5px; color:var(--text-muted); cursor:pointer;" onclick="go('habits')">Все →</span>
+        </div>
+        ${habitsPreview}
+      </div>
+
+      <div class="card">
+        <div class="row-between">
+          <h3 class="title-md" style="margin:0;">Движение</h3>
+          <span style="font-size:12.5px; color:var(--text-muted); cursor:pointer;" onclick="go('movement')">Открыть →</span>
+        </div>
+        <div class="habit-meta">${(mLog.types||[]).length ? 'Сегодня: ' + mLog.types.map(id=>(PRESET_MOVEMENT.find(m=>m.id===id)||{}).label).join(', ') : 'Пока не отмечено'}</div>
+        ${stepsLine}
+      </div>
+
+      ${state.sleepEnabled ? `
+      <div class="card">
+        <div class="row-between">
+          <h3 class="title-md" style="margin:0;">Сон</h3>
+          <span style="font-size:12.5px; color:var(--text-muted); cursor:pointer;" onclick="go('sleep')">Открыть →</span>
+        </div>
+        <div class="habit-meta">${sleepLine}</div>
+      </div>` : ''}
+    </div>
+  `;
+}
+
+function toggleHabitLog(habitId) {
+  const key = todayKey();
+  if (!state.habitLogs[key]) state.habitLogs[key] = {};
+  state.habitLogs[key][habitId] = !state.habitLogs[key][habitId];
+  save(); render();
+}
+
+/* =========================================================
+   HABITS SCREEN
+========================================================= */
+function computeStreak(habitId) {
+  let streak = 0;
+  for (let i = 0; i >= -365; i--) {
+    const key = dateKeyOffset(i);
+    const log = state.habitLogs[key];
+    if (log && log[habitId]) streak++;
+    else break;
+  }
+  return streak;
+}
+function last7(habitId) {
+  let out = [];
+  for (let i = -6; i <= 0; i++) {
+    const key = dateKeyOffset(i);
+    const log = state.habitLogs[key];
+    out.push(!!(log && log[habitId]));
+  }
+  return out;
+}
+
+function renderHabits() {
+  const log = state.habitLogs[todayKey()] || {};
+  const rows = state.habits.map(h => {
+    const streak = computeStreak(h.id);
+    const dots = last7(h.id).map(v => `<div class="heat-dot ${v?'on':''}"></div>`).join('');
+    return `
+      <div class="card">
+        <div class="row gap-12">
+          <div class="check-circle ${log[h.id] ? 'done':''}" onclick="toggleHabitLog('${h.id}')">${log[h.id] ? '✓' : ''}</div>
+          <div style="flex:1;">
+            <div class="habit-name">${h.label}</div>
+            <div class="habit-meta">${streak > 0 ? 'Серия: ' + streak + ' дн. подряд' : 'Начни серию сегодня'}</div>
+          </div>
+        </div>
+        <div class="heat-row">${dots}</div>
+      </div>
+    `;
+  }).join('') || `<p class="subtitle">Пока нет привычек. Добавь их в настройках.</p>`;
+
+  return `
+    <div class="screen">
+      <div class="top-bar"><h1 class="title-lg serif">Привычки</h1></div>
+      ${rows}
+    </div>
+  `;
+}
+
+/* =========================================================
+   ДВИЖЕНИЕ
+========================================================= */
+function todayMovement() {
+  if (!state.movementLogs[todayKey()]) state.movementLogs[todayKey()] = {types:[], steps:0};
+  return state.movementLogs[todayKey()];
+}
+function toggleMovementType(id) {
+  const m = todayMovement();
+  const idx = m.types.indexOf(id);
+  if (idx >= 0) m.types.splice(idx,1); else m.types.push(id);
+  save(); render();
+}
+function setSteps(v) {
+  const m = todayMovement();
+  m.steps = parseInt(v || '0', 10);
+  save();
+}
+
+function weeklyMovementSummary() {
+  const counts = {};
+  PRESET_MOVEMENT.forEach(m => counts[m.id] = 0);
+  for (let i=-6;i<=0;i++){
+    const log = state.movementLogs[dateKeyOffset(i)];
+    if (log) (log.types||[]).forEach(t => counts[t] = (counts[t]||0)+1);
+  }
+  return counts;
+}
+
+function renderMovement() {
+  const m = todayMovement();
+  const chips = state.movementTypes.map(id => {
+    const label = (PRESET_MOVEMENT.find(x=>x.id===id)||{}).label || id;
+    return `<div class="chip ${m.types.includes(id)?'selected':''}" onclick="toggleMovementType('${id}')">${label}</div>`;
+  }).join('') || `<p class="subtitle">Типы активности не выбраны — добавь их в настройках.</p>`;
+
+  const summary = weeklyMovementSummary();
+  const summaryRows = state.movementTypes.map(id => {
+    const label = (PRESET_MOVEMENT.find(x=>x.id===id)||{}).label || id;
+    return `<div class="settings-item"><span class="lbl">${label}</span><span class="val">${summary[id]||0} раз(а) за 7 дн.</span></div>`;
+  }).join('');
+
+  return `
+    <div class="screen">
+      <div class="top-bar"><h1 class="title-lg serif">Движение</h1></div>
+      <div class="card">
+        <h3 class="title-md">Сегодня</h3>
+        <div class="chip-grid">${chips}</div>
+        ${state.trackSteps ? `
+          <label class="field-label">Шаги сегодня</label>
+          <input type="number" min="0" value="${m.steps||''}" placeholder="0" oninput="setSteps(this.value)">
+        ` : ''}
+      </div>
+      <div class="card">
+        <h3 class="title-md">За неделю</h3>
+        ${summaryRows || '<p class="subtitle">Пока нет данных.</p>'}
+      </div>
+    </div>
+  `;
+}
+
+/* =========================================================
+   ПИТАНИЕ
+========================================================= */
+function allRecipes() {
+  return RECIPES.concat(state.customRecipes || []);
+}
+
+function renderNutrition() {
+  if (!state.nutritionEnabled) {
+    return `<div class="screen"><div class="top-bar"><h1 class="title-lg serif">Питание</h1></div>
+      <p class="subtitle">Раздел питания выключен. Можно включить в настройках.</p>
+      <button class="btn btn-primary" onclick="go('settings')">Открыть настройки</button>
+    </div>`;
+  }
+  const cards = allRecipes().map(r => `
+    <div class="recipe-card" onclick="openRecipe('${r.id}')">
+      <div class="recipe-img">${r.emoji}</div>
+      <div class="recipe-info">
+        <p class="recipe-title">${r.title}</p>
+        <p class="recipe-time">${r.time}</p>
+      </div>
+    </div>
+  `).join('');
+  return `
+    <div class="screen">
+      <div class="top-bar">
+        <h1 class="title-lg serif">Питание</h1>
+        <button class="btn-icon" onclick="openAddRecipe()">+</button>
+      </div>
+      <p class="subtitle">Стартовый набор рецептов — открой любой для подробностей, или добавь свой.</p>
+      <div class="recipe-grid">${cards}</div>
+    </div>
+  `;
+}
+let openRecipeId = null;
+function openRecipe(id) { openRecipeId = id; go('recipe'); }
+function renderRecipeDetail() {
+  const r = allRecipes().find(x => x.id === openRecipeId) || allRecipes()[0];
+  const cooked = !!state.recipeCookedLog[r.id];
+  const isCustom = state.customRecipes.some(x => x.id === r.id);
+  return `
+    <div class="screen">
+      <button class="btn-icon" onclick="go('nutrition')" style="margin-bottom:10px;">←</button>
+      <div style="text-align:center; font-size:72px; margin:6px 0 10px;">${r.emoji}</div>
+      <h1 class="title-lg serif" style="text-align:center;">${r.title}</h1>
+      <p class="subtitle" style="text-align:center;">${r.time}</p>
+      <div class="card">
+        <h3 class="title-md">Ингредиенты</h3>
+        ${r.ingredients.map(i => `<div class="ingredient-row"><span>${i.name}</span><span style="color:var(--text-muted);">${i.grams}</span></div>`).join('')}
+      </div>
+      <div class="card">
+        <h3 class="title-md">Приготовление</h3>
+        ${r.steps.map((s,i) => `<div class="step-item"><div class="step-num">${i+1}</div><div>${s}</div></div>`).join('')}
+      </div>
+      <button class="btn ${cooked ? 'btn-ghost':'btn-primary'} btn-block" onclick="toggleCooked('${r.id}')">
+        ${cooked ? 'Уже готовила 🤍' : 'Отметить, что приготовила'}
+      </button>
+      ${isCustom ? `<button class="btn btn-ghost btn-block" style="margin-top:10px; color:#A33;" onclick="deleteCustomRecipe('${r.id}')">Удалить рецепт</button>` : ''}
+    </div>
+  `;
+}
+function toggleCooked(id) {
+  state.recipeCookedLog[id] = !state.recipeCookedLog[id];
+  save(); render();
+}
+function deleteCustomRecipe(id) {
+  if (!confirm('Удалить этот рецепт?')) return;
+  state.customRecipes = state.customRecipes.filter(r => r.id !== id);
+  save(); go('nutrition');
+}
+
+/* ---- Добавление своего рецепта ---- */
+let draftRecipe = null;
+function openAddRecipe() {
+  draftRecipe = { title:'', emoji:'🍽️', time:'', ingredients:[{name:'', grams:''}], steps:[''] };
+  go('addRecipe');
+}
+function draftSetField(field, value) { draftRecipe[field] = value; }
+function draftAddIngredient() { draftRecipe.ingredients.push({name:'', grams:''}); render(); }
+function draftSetIngredient(i, field, value) { draftRecipe.ingredients[i][field] = value; }
+function draftRemoveIngredient(i) { draftRecipe.ingredients.splice(i,1); render(); }
+function draftAddStep() { draftRecipe.steps.push(''); render(); }
+function draftSetStep(i, value) { draftRecipe.steps[i] = value; }
+function draftRemoveStep(i) { draftRecipe.steps.splice(i,1); render(); }
+
+function renderAddRecipe() {
+  if (!draftRecipe) draftRecipe = { title:'', emoji:'🍽️', time:'', ingredients:[{name:'', grams:''}], steps:[''] };
+  const d = draftRecipe;
+  return `
+    <div class="screen">
+      <button class="btn-icon" onclick="go('nutrition')" style="margin-bottom:10px;">←</button>
+      <h1 class="title-lg serif">Свой рецепт</h1>
+      <div class="card">
+        <label class="field-label">Иконка (эмодзи)</label>
+        <input type="text" value="${d.emoji}" maxlength="2" style="width:70px; text-align:center; font-size:22px;" onchange="draftSetField('emoji', this.value)">
+        <label class="field-label">Название</label>
+        <input type="text" value="${d.title}" placeholder="Например: Гречка с грибами" onchange="draftSetField('title', this.value)">
+        <label class="field-label">Время приготовления</label>
+        <input type="text" value="${d.time}" placeholder="Например: 20 мин" onchange="draftSetField('time', this.value)">
+      </div>
+      <div class="card">
+        <h3 class="title-md">Ингредиенты</h3>
+        ${d.ingredients.map((ing,i) => `
+          <div class="row gap-8" style="margin-bottom:8px;">
+            <input type="text" value="${ing.name}" placeholder="Ингредиент" style="flex:2;" onchange="draftSetIngredient(${i},'name', this.value)">
+            <input type="text" value="${ing.grams}" placeholder="Кол-во" style="flex:1;" onchange="draftSetIngredient(${i},'grams', this.value)">
+            <button class="btn-icon" style="width:34px; height:34px; font-size:14px;" onclick="draftRemoveIngredient(${i})">✕</button>
+          </div>
+        `).join('')}
+        <button class="btn btn-ghost btn-sm" onclick="draftAddIngredient()">+ Ещё ингредиент</button>
+      </div>
+      <div class="card">
+        <h3 class="title-md">Шаги приготовления</h3>
+        ${d.steps.map((s,i) => `
+          <div class="row gap-8" style="margin-bottom:8px; align-items:flex-start;">
+            <div class="step-num" style="margin-top:10px;">${i+1}</div>
+            <textarea rows="2" style="flex:1;" placeholder="Что нужно сделать" onchange="draftSetStep(${i}, this.value)">${s}</textarea>
+            <button class="btn-icon" style="width:34px; height:34px; font-size:14px; margin-top:4px;" onclick="draftRemoveStep(${i})">✕</button>
+          </div>
+        `).join('')}
+        <button class="btn btn-ghost btn-sm" onclick="draftAddStep()">+ Ещё шаг</button>
+      </div>
+      <button class="btn btn-primary btn-block" onclick="saveDraftRecipe()">Сохранить рецепт</button>
+    </div>
+  `;
+}
+function saveDraftRecipe() {
+  const d = draftRecipe;
+  if (!d.title.trim()) { alert('Дай рецепту название'); return; }
+  const recipe = {
+    id: 'custom_' + Date.now(),
+    title: d.title.trim(),
+    emoji: d.emoji || '🍽️',
+    time: d.time || '—',
+    ingredients: d.ingredients.filter(i => i.name.trim()),
+    steps: d.steps.filter(s => s.trim()),
+  };
+  state.customRecipes.push(recipe);
+  draftRecipe = null;
+  save();
+  go('nutrition');
+}
+
+/* =========================================================
+   СОН
+========================================================= */
+function renderSleep() {
+  if (!state.sleepEnabled) {
+    return `<div class="screen"><div class="top-bar"><h1 class="title-lg serif">Сон</h1></div>
+      <p class="subtitle">Раздел сна выключен. Можно включить в настройках.</p>
+      <button class="btn btn-primary" onclick="go('settings')">Открыть настройки</button>
+    </div>`;
+  }
+  const today = state.sleepLogs[todayKey()] || {bedtime:'', wake:'', quality:3, note:''};
+  const last7rows = [];
+  for (let i=-6;i<=0;i++){
+    const key = dateKeyOffset(i);
+    const l = state.sleepLogs[key];
+    last7rows.push(`<div class="settings-item"><span class="lbl">${key.slice(5)}</span><span class="val">${l ? 'Качество ' + l.quality + '/5' : '—'}</span></div>`);
+  }
+  return `
+    <div class="screen">
+      <div class="top-bar"><h1 class="title-lg serif">Сон</h1></div>
+      <div class="card">
+        <h3 class="title-md">Сегодняшняя запись</h3>
+        <label class="field-label">Время отбоя</label>
+        <input type="time" value="${today.bedtime}" onchange="setSleepField('bedtime', this.value)">
+        <label class="field-label">Время подъёма</label>
+        <input type="time" value="${today.wake}" onchange="setSleepField('wake', this.value)">
+        <label class="field-label">Качество сна: <b>${today.quality}/5</b></label>
+        <input type="range" min="1" max="5" step="1" value="${today.quality}" oninput="setSleepField('quality', this.value)">
+        <label class="field-label">Заметка</label>
+        <input type="text" value="${today.note||''}" placeholder="Например: снилось море" onchange="setSleepField('note', this.value)">
+        <p class="habit-meta" style="margin-top:10px;">Цель: ${state.sleepGoalHours} ч, отбой к ${state.bedtimeGoal}</p>
+      </div>
+      <div class="card">
+        <h3 class="title-md">Последние 7 дней</h3>
+        ${last7rows.join('')}
+      </div>
+    </div>
+  `;
+}
+function setSleepField(field, value) {
+  const key = todayKey();
+  if (!state.sleepLogs[key]) state.sleepLogs[key] = {bedtime:'', wake:'', quality:3, note:''};
+  state.sleepLogs[key][field] = field === 'quality' ? parseInt(value,10) : value;
+  save();
+  if (field === 'quality') render();
+}
+
+/* =========================================================
+   НАСТРОЙКИ
+========================================================= */
+function renderSettings() {
+  return `
+    <div class="screen">
+      <div class="top-bar"><h1 class="title-lg serif">Настройки</h1></div>
+
+      <div class="card">
+        <h3 class="title-md">Привычки</h3>
+        <div class="chip-grid">
+          ${PRESET_HABITS.map(h => `<div class="chip ${state.habits.some(x=>x.id===h.id)?'selected':''}" onclick="toggleOnbHabit('${h.id}','${h.label}')">${h.label}</div>`).join('')}
+        </div>
+        <div class="row gap-8" style="margin-top:10px;">
+          <input type="text" id="customHabitInput" placeholder="Своя привычка">
+          <button class="btn-icon" onclick="addCustomHabit()">+</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="title-md">Движение</h3>
+        <div class="chip-grid">
+          ${PRESET_MOVEMENT.map(m => `<div class="chip ${state.movementTypes.includes(m.id)?'selected':''}" onclick="toggleOnbMovement('${m.id}')">${m.label}</div>`).join('')}
+        </div>
+        <div class="settings-item" style="margin-top:6px;">
+          <span class="lbl">Считать шаги</span>
+          <div class="toggle ${state.trackSteps?'on':''}" onclick="toggleSteps()"><div class="knob"></div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="title-md">Питание</h3>
+        <div class="settings-item">
+          <span class="lbl">Раздел питания</span>
+          <div class="toggle ${state.nutritionEnabled?'on':''}" onclick="toggleNutrition()"><div class="knob"></div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="title-md">Сон</h3>
+        <div class="settings-item">
+          <span class="lbl">Раздел сна</span>
+          <div class="toggle ${state.sleepEnabled?'on':''}" onclick="toggleSleep()"><div class="knob"></div></div>
+        </div>
+        ${state.sleepEnabled ? `
+          <label class="field-label">Целевая длительность: <b>${state.sleepGoalHours} ч</b></label>
+          <input type="range" min="5" max="10" step="0.5" value="${state.sleepGoalHours}" oninput="setSleepGoal(this.value)">
+          <label class="field-label">Желаемый отбой</label>
+          <input type="time" value="${state.bedtimeGoal}" onchange="setBedtimeGoal(this.value)">
+        ` : ''}
+      </div>
+
+      <div class="card">
+        <h3 class="title-md">Тон и поддержка</h3>
+        <div class="row gap-12">
+          <div class="chip ${state.tone==='soft'?'selected':''}" onclick="setTone('soft')" style="flex:1; text-align:center;">Мягкий</div>
+          <div class="chip ${state.tone==='strict'?'selected':''}" onclick="setTone('strict')" style="flex:1; text-align:center;">Строгий</div>
+        </div>
+        <label class="field-label">Самое сложное для тебя</label>
+        <div class="chip-grid">
+          ${HARDEST_OPTIONS.map(h => `<div class="chip ${state.hardestArea===h.id?'selected':''}" onclick="setHardest('${h.id}')">${h.label}</div>`).join('')}
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="title-md">Внешний вид</h3>
+        <div class="settings-item">
+          <span class="lbl">Тёмная тема</span>
+          <div class="toggle ${state.darkMode?'on':''}" onclick="setDarkPreview(${!state.darkMode})">
+            <div class="knob"></div>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn btn-ghost btn-block" style="margin-top:6px; color:#A33;" onclick="resetApp()">Начать заново (удалить все данные)</button>
+    </div>
+  `;
+}
+
+function resetApp() {
+  if (!confirm('Точно удалить все данные и пройти онбординг заново?')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  state = defaultState();
+  render();
+}
+
+/* =========================================================
+   НИЖНЯЯ НАВИГАЦИЯ
+========================================================= */
+function renderBottomNav() {
+  const items = [
+    {id:'dashboard', label:'Главная', icon:'🏠'},
+    {id:'habits', label:'Привычки', icon:'✅'},
+    {id:'movement', label:'Движение', icon:'🚶'},
+  ];
+  if (state.nutritionEnabled) items.push({id:'nutrition', label:'Питание', icon:'🍲'});
+  if (state.sleepEnabled) items.push({id:'sleep', label:'Сон', icon:'🌙'});
+
+  const activeScreen = (state.screen === 'recipe') ? 'nutrition' : state.screen;
+
+  return `
+    <div class="bottom-nav">
+      ${items.map(it => `
+        <button class="nav-item ${activeScreen===it.id?'active':''}" onclick="go('${it.id}')">
+          <span class="ic">${it.icon}</span>
+          <span>${it.label}</span>
+        </button>
+      `).join('')}
+    </div>
+  `;
+}
+
+/* =========================================================
+   СТАРТ
+========================================================= */
+render();
+</script>
+</body>
+</html>
