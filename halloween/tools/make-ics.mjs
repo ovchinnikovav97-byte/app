@@ -8,21 +8,36 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const html = readFileSync(join(root, 'index.html'), 'utf8');
 const cfg = JSON.parse(html.match(/<script id="party-config" type="application\/json">([\s\S]*?)<\/script>/)[1]);
 
+const at = {
+  en: (t) => { const h = +t.slice(0, 2); return ((h % 12) || 12) + ':' + t.slice(3, 5) + (h < 12 ? ' a.m.' : ' p.m.'); },
+  fr: (t) => (+t.slice(0, 2)) + 'h' + (t.slice(3, 5) === '00' ? '' : t.slice(3, 5)),
+  ru: (t) => t
+};
+const city = (lang) => cfg.city[lang] || cfg.city.en;
 const TEXT = {
   en: {
-    summary: `🎃 Halloween around the world · ${cfg.host.en}’s birthday`,
-    description: 'Come as a country (or a culture you love) and bring one dish from there. We put everything on one big table and taste it together.\nThe address comes in a personal message.',
-    alarm: 'Tomorrow: Halloween around the world. Costume and dish ready?'
+    summary: `The Eye of Siberia · ${cfg.host.en}’s Birthday Expedition`,
+    description: 'An original role-playing game: The Black Tears of Baikal.\n' +
+      'Dress as one country of your choice. Bring your favourite dish to share on the long journey.\n' +
+      (cfg.startTime ? `The convoy departs at ${at.en(cfg.startTime)} sharp. ` : '') +
+      `Boarding point: Listvyanka Station, ${city('en')}. The exact address comes once your visa is validated.`,
+    alarm: 'Tomorrow the convoy departs for Baikal. Costume and dish ready?'
   },
   fr: {
-    summary: `🎃 Halloween autour du monde · l’anniversaire de ${cfg.host.fr}`,
-    description: 'Viens en représentant un pays (ou une culture que tu aimes) et apporte un plat de là-bas. Tout va sur une grande table et on goûte à tout ensemble.\nL’adresse arrive en message perso.',
-    alarm: 'Demain : Halloween autour du monde. Costume et plat prêts ?'
+    summary: `L’Œil de la Sibérie · l’expédition d’anniversaire de ${cfg.host.fr}`,
+    description: 'Un jeu de rôle original : Les Larmes noires du Baïkal.\n' +
+      'Habillez-vous en un pays de votre choix. Apportez votre plat préféré à partager pendant le long voyage.\n' +
+      (cfg.startTime ? `Le convoi part à ${at.fr(cfg.startTime)} précises. ` : '') +
+      `Point d’embarquement : gare de Listvianka, ${city('fr')}. L’adresse exacte vous parviendra une fois votre visa validé.`,
+    alarm: 'Demain, le convoi part pour le Baïkal. Costume et plat prêts ?'
   },
   ru: {
-    summary: `🎃 Хэллоуин вокруг света · день рождения ${cfg.host.ruGen}`,
-    description: 'Костюм страны (или культуры), которую представляешь, и одно блюдо оттуда. Всё ставим на один большой стол и пробуем вместе.\nАдрес пришлю лично.',
-    alarm: 'Завтра Хэллоуин вокруг света. Костюм и блюдо готовы?'
+    summary: `Око Сибири · экспедиция на день рождения ${cfg.host.ruGen}`,
+    description: 'Авторская ролевая игра «Чёрные слёзы Байкала».\n' +
+      'Наряд одной страны на ваш выбор. Возьмите любимое блюдо, чтобы разделить его в долгой дороге.\n' +
+      (cfg.startTime ? `Конвой отправляется ровно в ${at.ru(cfg.startTime)}. ` : '') +
+      `Место посадки: станция Листвянка, ${city('ru')}. Точный адрес пришлём после оформления визы.`,
+    alarm: 'Завтра конвой отправляется на Байкал. Костюм и блюдо готовы?'
   }
 };
 
@@ -76,7 +91,7 @@ for (const lang of Object.keys(TEXT)) {
     ...when,
     `SUMMARY:${esc(tx.summary)}`,
     `DESCRIPTION:${esc(tx.description + '\n' + cfg.pageUrl)}`,
-    `LOCATION:${esc(cfg.city[lang] || cfg.city.en)}`,
+    `LOCATION:${esc(cfg.address || city(lang))}`,
     `URL:${cfg.pageUrl}`,
     'BEGIN:VALARM', 'ACTION:DISPLAY', `DESCRIPTION:${esc(tx.alarm)}`,
     cfg.startTime ? 'TRIGGER:-P1D' : 'TRIGGER:-PT15H',

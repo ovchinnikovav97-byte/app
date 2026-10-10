@@ -5,20 +5,21 @@ CALSCALE:GREGORIAN
 METHOD:PUBLISH
 BEGIN:VEVENT
 UID:halloween-2026-10-31@ovchinnikovav97-byte.github.io
-DTSTAMP:20261010T080703Z
-DTSTART;VALUE=DATE:20261031
-DTEND;VALUE=DATE:20261101
-SUMMARY:🎃 Halloween around the world · Viktoriia’s birthday
-DESCRIPTION:Come as a country (or a culture you love) and bring one dish fr
- om there. We put everything on one big table and taste it together.\nThe a
- ddress comes in a personal message.\nhttps://ovchinnikovav97-byte.github.i
- o/app/halloween/
-LOCATION:Paris
+DTSTAMP:20261010T084546Z
+DTSTART:20261031T180000Z
+DTEND:20261031T230000Z
+SUMMARY:The Eye of Siberia · Vika’s Birthday Expedition
+DESCRIPTION:An original role-playing game: The Black Tears of Baikal.\nDres
+ s as one country of your choice. Bring your favourite dish to share on the
+  long journey.\nThe convoy departs at 7:00 p.m. sharp. Boarding point: Lis
+ tvyanka Station\, Villejuif. The exact address comes once your visa is val
+ idated.\nhttps://ovchinnikovav97-byte.github.io/app/halloween/
+LOCATION:Villejuif
 URL:https://ovchinnikovav97-byte.github.io/app/halloween/
 BEGIN:VALARM
 ACTION:DISPLAY
-DESCRIPTION:Tomorrow: Halloween around the world. Costume and dish ready?
-TRIGGER:-PT15H
+DESCRIPTION:Tomorrow the convoy departs for Baikal. Costume and dish ready?
+TRIGGER:-P1D
 END:VALARM
 END:VEVENT
 END:VCALENDAR

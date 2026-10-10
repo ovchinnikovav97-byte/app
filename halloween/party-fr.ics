@@ -5,20 +5,23 @@ CALSCALE:GREGORIAN
 METHOD:PUBLISH
 BEGIN:VEVENT
 UID:halloween-2026-10-31@ovchinnikovav97-byte.github.io
-DTSTAMP:20261010T080703Z
-DTSTART;VALUE=DATE:20261031
-DTEND;VALUE=DATE:20261101
-SUMMARY:🎃 Halloween autour du monde · l’anniversaire de Viktoriia
-DESCRIPTION:Viens en représentant un pays (ou une culture que tu aimes) et
-  apporte un plat de là-bas. Tout va sur une grande table et on goûte à 
- tout ensemble.\nL’adresse arrive en message perso.\nhttps://ovchinnikova
- v97-byte.github.io/app/halloween/
-LOCATION:Paris
+DTSTAMP:20261010T084546Z
+DTSTART:20261031T180000Z
+DTEND:20261031T230000Z
+SUMMARY:L’Œil de la Sibérie · l’expédition d’anniversaire de Vika
+DESCRIPTION:Un jeu de rôle original : Les Larmes noires du Baïkal.\nHabil
+ lez-vous en un pays de votre choix. Apportez votre plat préféré à part
+ ager pendant le long voyage.\nLe convoi part à 19h précises. Point d’e
+ mbarquement : gare de Listvianka\, Villejuif. L’adresse exacte vous parv
+ iendra une fois votre visa validé.\nhttps://ovchinnikovav97-byte.github.i
+ o/app/halloween/
+LOCATION:Villejuif
 URL:https://ovchinnikovav97-byte.github.io/app/halloween/
 BEGIN:VALARM
 ACTION:DISPLAY
-DESCRIPTION:Demain : Halloween autour du monde. Costume et plat prêts ?
-TRIGGER:-PT15H
+DESCRIPTION:Demain\, le convoi part pour le Baïkal. Costume et plat prêts
+  ?
+TRIGGER:-P1D
 END:VALARM
 END:VEVENT
 END:VCALENDAR

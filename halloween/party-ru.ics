@@ -5,23 +5,26 @@ CALSCALE:GREGORIAN
 METHOD:PUBLISH
 BEGIN:VEVENT
 UID:halloween-2026-10-31@ovchinnikovav97-byte.github.io
-DTSTAMP:20261010T080703Z
-DTSTART;VALUE=DATE:20261031
-DTEND;VALUE=DATE:20261101
-SUMMARY:🎃 Хэллоуин вокруг света · день рожд
- ения Виктории
-DESCRIPTION:Костюм страны (или культуры)\, кото
- рую представляешь\, и одно блюдо оттуда. 
- Всё ставим на один большой стол и пробуе
- м вместе.\nАдрес пришлю лично.\nhttps://ovchinnikov
- av97-byte.github.io/app/halloween/
-LOCATION:Париж
+DTSTAMP:20261010T084546Z
+DTSTART:20261031T180000Z
+DTEND:20261031T230000Z
+SUMMARY:Око Сибири · экспедиция на день рожд
+ ения Вики
+DESCRIPTION:Авторская ролевая игра «Чёрные сл
+ ёзы Байкала».\nНаряд одной страны на ваш 
+ выбор. Возьмите любимое блюдо\, чтобы раз
+ делить его в долгой дороге.\nКонвой отпра
+ вляется ровно в 19:00. Место посадки: станц
+ ия Листвянка\, Вильжюиф. Точный адрес при
+ шлём после оформления визы.\nhttps://ovchinnikovav9
+ 7-byte.github.io/app/halloween/
+LOCATION:Вильжюиф
 URL:https://ovchinnikovav97-byte.github.io/app/halloween/
 BEGIN:VALARM
 ACTION:DISPLAY
-DESCRIPTION:Завтра Хэллоуин вокруг света. Кост
- юм и блюдо готовы?
-TRIGGER:-PT15H
+DESCRIPTION:Завтра конвой отправляется на Бай
+ кал. Костюм и блюдо готовы?
+TRIGGER:-P1D
 END:VALARM
 END:VEVENT
 END:VCALENDAR
