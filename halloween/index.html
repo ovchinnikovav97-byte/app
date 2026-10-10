@@ -741,7 +741,7 @@
         <div class="fact">
           <span class="k" data-t="dresscode">Dress code</span>
           <span class="dress"><b data-t="dress1a">Dress as one country</b> <span data-t="dress1b">of your choice.</span></span>
-          <span class="dress"><b data-t="dress2a">Bring your favourite dish</b> <span data-t="dress2b">to share on the long journey.</span></span>
+          <span class="dress"><b data-t="dress2a">Bring your favourite dish</b> <span data-t="dress2b">from that country to share on the long journey.</span></span>
         </div>
       </div>
 
@@ -874,10 +874,11 @@
             <p class="err" id="e-country" hidden></p>
           </div>
 
-          <div class="field">
-            <label class="label" for="f-dish"><span data-t="dishLabel"></span> <span class="opt">(<span data-t="optional"></span>)</span></label>
-            <input type="text" id="f-dish" maxlength="120" data-tp="dishPh" aria-describedby="h-dish">
+          <div class="field" id="fld-dish">
+            <label class="label" for="f-dish" data-t="dishLabel"></label>
+            <input type="text" id="f-dish" maxlength="120" data-tp="dishPh" aria-describedby="h-dish e-dish">
             <p class="hint" id="h-dish" data-t="dishHint"></p>
+            <p class="err" id="e-dish" hidden></p>
           </div>
         </div>
 
@@ -965,7 +966,7 @@
       whereLater: function (c) { return c + '. The exact address comes once your visa is validated.'; },
       dresscode: 'Dress code',
       dress1a: 'Dress as one country', dress1b: 'of your choice.',
-      dress2a: 'Bring your favourite dish', dress2b: 'to share on the long journey.',
+      dress2a: 'Bring your favourite dish', dress2b: 'from that country to share on the long journey.',
       stampRing: 'TOURIST VISA • LAKE BAIKAL •', stampBy: function (d, m) { return 'BY ' + d + ' · ' + m; },
       visaBy: function (dm) { return dm ? 'Please validate your tourist visa before ' + dm + '.' : 'Please validate your tourist visa.'; },
       disclaimer: 'The agency declines all responsibility for travellers caught by the Spawn of the Forest.',
@@ -984,7 +985,9 @@
       useCustom: function (t) { return 'Use “' + t + '”'; },
       onMap: 'on board',
       taken: function (c) { return c + ' is already on board. Join them or pick another country, both work.'; },
-      dishLabel: 'Dish for the journey', dishPh: 'e.g. grandma’s pierogi', dishHint: 'You can decide later and update your visa.',
+      dishLabel: 'Your dish for the journey', dishPh: 'e.g. paella for Spain',
+      dishHint: 'A dish you love from the country or culture you represent: it travels with you and we taste it together. You can still change it later by updating your visa.',
+      errDish: 'Please tell the agency which dish from your country you are bringing.',
       noteLabel: 'A note for the agency', notePh: function () { return 'Allergies, questions, or just hello to ' + H('en'); },
       optional: 'optional',
       send: 'Submit my application', update: 'Update my visa', keep: 'Keep my visa as it is', sending: 'Stamping…',
@@ -1026,7 +1029,7 @@
       whereLater: function (c) { return c + '. L’adresse exacte vous parviendra une fois votre visa validé.'; },
       dresscode: 'Tenue exigée',
       dress1a: 'Habillez-vous en un pays', dress1b: 'de votre choix.',
-      dress2a: 'Apportez votre plat préféré', dress2b: 'à partager pendant le long voyage.',
+      dress2a: 'Apportez votre plat préféré', dress2b: 'de ce pays, à partager pendant le long voyage.',
       stampRing: 'VISA TOURISTIQUE • LAC BAÏKAL •', stampBy: function (d, m) { return 'AVANT ' + d + ' · ' + m; },
       visaBy: function (dm) { return dm ? 'Veuillez faire valider votre visa touristique avant le ' + dm + '.' : 'Veuillez faire valider votre visa touristique.'; },
       disclaimer: 'L’agence décline toute responsabilité envers les voyageurs capturés par l’Engeance de la Forêt.',
@@ -1045,7 +1048,9 @@
       useCustom: function (t) { return 'Choisir «' + NB + t + NB + '»'; },
       onMap: 'à bord',
       taken: function (c) { return '«' + NB + c + NB + '» est déjà à bord. Rejoignez-les ou choisissez un autre pays, les deux marchent.'; },
-      dishLabel: 'Plat pour le voyage', dishPh: 'p. ex. les pierogi de mamie', dishHint: 'Vous pourrez décider plus tard et mettre à jour votre visa.',
+      dishLabel: 'Votre plat pour le voyage', dishPh: 'p. ex. une paella pour l’Espagne',
+      dishHint: 'Un plat que vous aimez, du pays ou de la culture que vous représentez' + NB + ': il voyage avec vous et nous le goûtons ensemble. Vous pourrez le changer plus tard en mettant à jour votre visa.',
+      errDish: 'Veuillez indiquer à l’agence quel plat de votre pays vous apportez.',
       noteLabel: 'Un mot pour l’agence', notePh: function () { return 'Allergies, questions, ou juste un coucou à ' + H('fr'); },
       optional: 'facultatif',
       send: 'Envoyer ma demande', update: 'Mettre à jour mon visa', keep: 'Garder mon visa tel quel', sending: 'Tamponnage…',
@@ -1087,7 +1092,7 @@
       whereLater: function (c) { return c + '. Точный адрес пришлём после оформления визы.'; },
       dresscode: 'Дресс-код',
       dress1a: 'Наряд одной страны', dress1b: 'на ваш выбор.',
-      dress2a: 'Возьмите любимое блюдо,', dress2b: 'чтобы разделить его в долгой дороге.',
+      dress2a: 'Возьмите любимое блюдо', dress2b: 'этой страны, чтобы разделить его в долгой дороге.',
       stampRing: 'ТУРИСТИЧЕСКАЯ ВИЗА • БАЙКАЛ •', stampBy: function (d, m) { return 'ДО ' + d + ' · ' + m; },
       visaBy: function (dm) { return dm ? 'Просим оформить туристическую визу до ' + dm + '.' : 'Просим оформить туристическую визу.'; },
       disclaimer: 'Агентство не несёт ответственности за путешественников, пойманных Лесным Отродьем.',
@@ -1106,7 +1111,9 @@
       useCustom: function (t) { return 'Выбрать «' + t + '»'; },
       onMap: 'на борту',
       taken: function (c) { return '«' + c + '» уже на борту. Можно присоединиться или выбрать другую страну.'; },
-      dishLabel: 'Блюдо в дорогу', dishPh: 'например, бабушкины пирожки', dishHint: 'Можно решить позже и обновить визу.',
+      dishLabel: 'Ваше блюдо в дорогу', dishPh: 'например, паэлья за Испанию',
+      dishHint: 'Любимое блюдо той страны или культуры, которую вы представляете: оно едет с вами, и мы пробуем его вместе. Поменять можно позже, обновив визу.',
+      errDish: 'Укажите, пожалуйста, какое блюдо вашей страны вы везёте.',
       noteLabel: 'Пара слов агентству', notePh: function () { return 'Аллергии, вопросы или просто привет ' + CFG.host.ruDat; },
       optional: 'необязательно',
       send: 'Отправить анкету', update: 'Обновить визу', keep: 'Оставить визу как есть', sending: 'Ставим печать…',
@@ -1245,11 +1252,7 @@
     if (q && LANGS.indexOf(q) >= 0) return q;
     var s = store.get(K_LANG);
     if (s && LANGS.indexOf(s) >= 0) return s;
-    var prefs = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || 'en'];
-    for (var i = 0; i < prefs.length; i++) {
-      var l = String(prefs[i]).slice(0, 2).toLowerCase();
-      if (LANGS.indexOf(l) >= 0) return l;
-    }
+    // English for everyone, like the poster. FR/RU only by the buttons or a ?lang= link.
     return 'en';
   }
   function t(key) {
@@ -1580,7 +1583,7 @@
     var p = $('e-' + field), wrap = $('fld-' + field);
     p.textContent = msg; p.hidden = !msg;
     if (wrap) wrap.classList.toggle('invalid', !!msg);
-    var input = field === 'name' ? $('f-name') : field === 'country' ? $('f-country') : null;
+    var input = { name: $('f-name'), country: $('f-country'), dish: $('f-dish') }[field] || null;
     if (input) input.setAttribute('aria-invalid', String(!!msg));
   }
   function clearError(field) { setError(field, ''); }
@@ -1606,6 +1609,9 @@
     var needCountry = d.coming === 'yes' && !d.code && !d.custom;
     setError('country', needCountry ? t('errCountry') : '');
     if (needCountry) first = first || $('f-country');
+    var needDish = d.coming === 'yes' && !d.dish;
+    setError('dish', needDish ? t('errDish') : '');
+    if (needDish) first = first || $('f-dish');
     return first;
   }
   function fillForm(s) {
@@ -1757,7 +1763,7 @@
       if (!$('country-list').hidden) openList();
       Array.prototype.forEach.call(document.querySelectorAll('.err:not([hidden])'), function (p) {
         var field = p.id.slice(2);
-        setError(field, t(field === 'name' ? 'errName' : field === 'coming' ? 'errComing' : 'errCountry'));
+        setError(field, t({ name: 'errName', coming: 'errComing', country: 'errCountry', dish: 'errDish' }[field]));
       });
       if (!$('fallback').hidden && $('fallback').dataset.forced) showFallback(collect());
       if ($('status').className.indexOf('error') >= 0) $('status').textContent = t('errSend');
@@ -1772,6 +1778,7 @@
     });
   });
   $('f-name').addEventListener('input', function () { if (this.value.trim()) clearError('name'); });
+  $('f-dish').addEventListener('input', function () { if (this.value.trim()) clearError('dish'); });
   $('plus-dec').addEventListener('click', function () { plus = Math.max(0, plus - 1); renderPlus(); });
   $('plus-inc').addEventListener('click', function () { plus = Math.min(CFG.maxPlusOnes, plus + 1); renderPlus(); });
 

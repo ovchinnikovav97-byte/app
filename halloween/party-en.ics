@@ -5,15 +5,16 @@ CALSCALE:GREGORIAN
 METHOD:PUBLISH
 BEGIN:VEVENT
 UID:halloween-2026-10-31@ovchinnikovav97-byte.github.io
-DTSTAMP:20261010T084546Z
+DTSTAMP:20261010T090411Z
 DTSTART:20261031T180000Z
 DTEND:20261031T230000Z
 SUMMARY:The Eye of Siberia · Vika’s Birthday Expedition
 DESCRIPTION:An original role-playing game: The Black Tears of Baikal.\nDres
- s as one country of your choice. Bring your favourite dish to share on the
-  long journey.\nThe convoy departs at 7:00 p.m. sharp. Boarding point: Lis
- tvyanka Station\, Villejuif. The exact address comes once your visa is val
- idated.\nhttps://ovchinnikovav97-byte.github.io/app/halloween/
+ s as one country of your choice. Bring your favourite dish from that count
+ ry to share on the long journey.\nThe convoy departs at 7:00 p.m. sharp. B
+ oarding point: Listvyanka Station\, Villejuif. The exact address comes onc
+ e your visa is validated.\nhttps://ovchinnikovav97-byte.github.io/app/hall
+ oween/
 LOCATION:Villejuif
 URL:https://ovchinnikovav97-byte.github.io/app/halloween/
 BEGIN:VALARM

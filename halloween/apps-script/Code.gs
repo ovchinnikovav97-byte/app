@@ -77,6 +77,8 @@ function doPost(e) {
   var rsvp = clean_(data);
   if (!rsvp.id || !rsvp.name) return json_({ ok: false, error: 'missing_fields' });
   if (rsvp.coming === YES && !rsvp.country) return json_({ ok: false, error: 'missing_country' });
+  // Блюдо обязательно: каждый везёт блюдо той страны или культуры, которую представляет.
+  if (rsvp.coming === YES && !rsvp.dish) return json_({ ok: false, error: 'missing_dish' });
 
   var lock = LockService.getScriptLock();
   lock.waitLock(20000);
