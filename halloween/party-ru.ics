@@ -1,0 +1,30 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//secondbrain//halloween-party//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:halloween-2026-10-31@ovchinnikovav97-byte.github.io
+DTSTAMP:20261010T084546Z
+DTSTART:20261031T180000Z
+DTEND:20261031T230000Z
+SUMMARY:Око Сибири · экспедиция на день рожд
+ ения Вики
+DESCRIPTION:Авторская ролевая игра «Чёрные сл
+ ёзы Байкала».\nНаряд одной страны на ваш 
+ выбор. Возьмите любимое блюдо\, чтобы раз
+ делить его в долгой дороге.\nКонвой отпра
+ вляется ровно в 19:00. Место посадки: станц
+ ия Листвянка\, Вильжюиф. Точный адрес при
+ шлём после оформления визы.\nhttps://ovchinnikovav9
+ 7-byte.github.io/app/halloween/
+LOCATION:Вильжюиф
+URL:https://ovchinnikovav97-byte.github.io/app/halloween/
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Завтра конвой отправляется на Бай
+ кал. Костюм и блюдо готовы?
+TRIGGER:-P1D
+END:VALARM
+END:VEVENT
+END:VCALENDAR

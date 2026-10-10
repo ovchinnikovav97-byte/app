@@ -1,0 +1,1860 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Visit Siberia! · Vika’s Birthday Expedition</title>
+<meta name="description" content="The Eye of Siberia. Vika’s birthday expedition, 31 October 2026, 7 p.m. An original role-playing game: The Black Tears of Baikal. Dress as one country, bring your favourite dish.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#1F1510">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ovchinnikovav97-byte.github.io/app/halloween/">
+<meta property="og:title" content="Visit Siberia! · Vika’s Birthday Expedition">
+<meta property="og:description" content="31 October, 7 p.m. sharp. An original role-playing game: The Black Tears of Baikal. Please validate your tourist visa.">
+<meta property="og:image" content="https://ovchinnikovav97-byte.github.io/app/halloween/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect x='20' y='20' width='60' height='60' transform='rotate(45 50 50)' fill='%236E1423'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Josefin+Sans:wght@400;600;700&family=Rock+Salt&family=Playfair+Display:ital,wght@0,500..900;1,500..900&family=Jost:wght@400;600;700&family=Caveat:wght@700&display=swap">
+
+<!--
+  НАСТРОЙКИ ВЕЧЕРИНКИ. Меняются только значения справа от двоеточия, кавычки оставь.
+  endpoint    — адрес веб-приложения Google Apps Script (заканчивается на /exec), см. setup_rsvp.md
+  startTime   — время отправления конвоя, "19:00". Пусто — на странице «вечером»
+  endTime     — время окончания, например "02:00" (необязательно)
+  rsvpBy      — до какого числа ждём визы-ответы, "2026-10-17". Пусто — без срока
+  address     — улица на странице. ПУСТО НАРОЧНО: репозиторий публичный. Адрес лучше
+                вписать в скрипт таблицы (PRIVATE_DETAILS): его увидят только ответившие «да»
+  maxPlusOnes — сколько спутников максимум можно взять с собой
+  После смены даты или времени: node halloween/tools/make-ics.mjs (пересобрать календари)
+-->
+<script id="party-config" type="application/json">
+{
+  "host": { "en": "Vika", "fr": "Vika", "ru": "Вика", "ruGen": "Вики", "ruDat": "Вике" },
+  "date": "2026-10-31",
+  "startTime": "19:00",
+  "endTime": "",
+  "timeZone": "Europe/Paris",
+  "city": { "en": "Villejuif", "fr": "Villejuif", "ru": "Вильжюиф" },
+  "address": "",
+  "rsvpBy": "2026-10-17",
+  "maxPlusOnes": 6,
+  "endpoint": "",
+  "hostLang": "ru",
+  "showTakenCountries": true,
+  "pageUrl": "https://ovchinnikovav97-byte.github.io/app/halloween/"
+}
+</script>
+
+<style>
+  /* Design: «Baikal Black Tears Poster», Claude Design canvas by Vika (10.10.2026). */
+  :root {
+    --table: #1F1510;
+    --paper: #EAD8B8;
+    --paper-hi: #F3E6CC;
+    --ink: #3A2418;
+    --ink-soft: #5A4232;
+    --wine: #6E1423;
+    --wine-deep: #540E1A;
+    --rust: #8E2418;
+    --char: #1C1614;
+    --night: #1A0B0D;
+    --error: #A0191F;
+    --serif: 'Bodoni Moda', 'Playfair Display', Georgia, 'Times New Roman', serif;
+    --sans: 'Josefin Sans', 'Jost', 'Century Gothic', Futura, sans-serif;
+    --hand: 'Rock Salt', 'Caveat', 'Comic Sans MS', cursive;
+    --mono: 'Courier New', Courier, monospace;
+    --gutter: 14px;
+    color-scheme: light;
+  }
+  /* Bodoni Moda, Josefin Sans и Rock Salt без кириллицы: для русского их ближайшие родственники. */
+  html[lang="ru"] {
+    --serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
+    --sans: 'Jost', 'Century Gothic', Futura, sans-serif;
+    --hand: 'Caveat', 'Comic Sans MS', cursive;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--table); color: var(--ink);
+    font: 400 16px/1.5 var(--sans); -webkit-font-smoothing: antialiased; overflow-x: hidden;
+  }
+  [hidden] { display: none !important; }
+  a { color: var(--wine); }
+  a:hover { color: var(--ink); }
+  button { font-family: inherit; }
+  :focus-visible { outline: 2px solid var(--wine); outline-offset: 3px; }
+  .sr-only {
+    position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+
+  .table { max-width: 900px; margin: 0 auto; padding: 0 var(--gutter) 40px; }
+
+  /* ── Language tabs on the dark table ── */
+  .langs { display: flex; justify-content: flex-end; gap: 4px; padding: 12px 0 10px; }
+  .langs button {
+    min-width: 44px; height: 36px; padding: 0 10px; border: 1px solid transparent; border-radius: 2px;
+    background: transparent; color: #CDB894; font: 700 13px/1 var(--sans); letter-spacing: .22em;
+    text-transform: uppercase; cursor: pointer;
+  }
+  .langs button[aria-pressed="true"] { border-color: #CDB894; color: var(--paper); }
+  .langs button:focus-visible { outline-color: var(--paper); }
+
+  /* ── Paper sheets ── */
+  .sheet {
+    position: relative; background: var(--paper); color: var(--ink);
+    box-shadow: inset 0 0 90px rgba(92,52,24,.38), 0 24px 60px rgba(0,0,0,.55);
+    padding: 12px; overflow: hidden;
+  }
+  .sheet::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none; mix-blend-mode: multiply; opacity: .22;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='p' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.55  0 0 0 0 0.42  0 0 0 0 0.3  0 0 0 0.9 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E"); background-size: 240px 240px;
+  }
+  .frame {
+    position: relative; border: 6px double var(--ink); padding: 14px 14px 18px;
+    display: flex; flex-direction: column; gap: 18px;
+  }
+  @media (min-width: 640px) {
+    .sheet { padding: 28px; }
+    .frame { padding: 22px 24px 26px; gap: 22px; }
+    :root { --gutter: 20px; }
+  }
+
+  .strip {
+    display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 6px 16px;
+    font: 700 11px/1.3 var(--sans); letter-spacing: .24em; text-transform: uppercase;
+    border-bottom: 1px solid var(--ink); padding-bottom: 10px;
+  }
+  .diamond { flex: none; }
+  .strip span { text-wrap: balance; }
+  @media (max-width: 639px) {
+    .strip { flex-direction: column; text-align: center; font-size: 10px; letter-spacing: .2em; }
+    .visa-box .print { width: 42px; height: 48px; top: -30px; right: 4px; }
+  }
+
+  /* ── Headline: Visit (crossed out) never leave Siberia! ── */
+  .visit {
+    margin: 26px 0 0; text-align: center; color: var(--wine);
+    font: italic 600 clamp(44px, 12.5vw, 80px)/1.04 var(--serif); letter-spacing: -.01em;
+  }
+  .visit .crossed { position: relative; display: inline-block; }
+  .visit .scribble { position: absolute; left: -.15em; top: .3em; width: calc(100% + .3em); height: .58em; overflow: visible; }
+  .visit .scrawl {
+    position: absolute; left: -.4em; top: -.5em; white-space: nowrap; color: var(--char);
+    font: 400 .31em/1.2 var(--hand); letter-spacing: .02em; font-style: normal;
+    transform: rotate(-8deg); transform-origin: left bottom;
+  }
+  html[lang="ru"] .visit .scrawl { font-size: .42em; font-weight: 700; top: -.62em; }
+
+  .plate { margin: 0; border: 3px solid var(--ink); padding: 4px; background: var(--paper); }
+  .plate-in { border: 1px solid var(--ink); line-height: 0; }
+  .plate svg { display: block; width: 100%; height: auto; aspect-ratio: 836 / 620; }
+  svg text.ring { font-family: var(--sans); }
+  svg text.big { font-family: var(--serif); }
+
+  .titles { text-align: center; }
+  .stay { margin: 0; font: italic 500 clamp(21px, 5.6vw, 30px)/1.15 var(--serif); }
+  .divider { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 10px 0 8px; }
+  .divider span { display: block; width: min(120px, 25vw); height: 1px; background: var(--ink); }
+  .eye {
+    margin: 0; color: var(--wine); font: 800 clamp(30px, 8.6vw, 54px)/1.02 var(--serif);
+    letter-spacing: .06em; text-transform: uppercase;
+  }
+
+  .expedition { text-align: center; color: var(--wine); }
+  .exp { margin: 0; font: 700 clamp(12px, 3.4vw, 15px)/1.4 var(--sans); letter-spacing: .3em; text-transform: uppercase; }
+  .game { margin: 8px 0 0; font: italic 400 clamp(18px, 4.8vw, 22px)/1.35 var(--serif); color: var(--ink); }
+  .game .tears { position: relative; display: inline-block; font-weight: 700; color: var(--night); }
+  .game .tears svg { position: absolute; left: 0; top: 84%; width: 100%; height: 18px; overflow: visible; }
+
+  /* ── Departure / Boarding point / Dress code ── */
+  .facts {
+    display: grid; grid-template-columns: 1fr; border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink);
+  }
+  .fact { display: flex; flex-direction: column; gap: 6px; padding: 14px 4px; }
+  .fact + .fact { border-top: 1px solid var(--ink); }
+  @media (min-width: 640px) {
+    .facts { grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 16px 0; }
+    .fact { padding: 0 16px; }
+    .fact:first-child { padding-left: 4px; }
+    .fact:last-child { padding-right: 4px; }
+    .fact + .fact { border-top: 0; border-left: 1px solid var(--ink); }
+  }
+  .fact .k { font: 700 12px/1.3 var(--sans); letter-spacing: .3em; text-transform: uppercase; color: var(--rust); }
+  .fact .v { font: 700 clamp(26px, 7vw, 30px)/1.05 var(--serif); }
+  .fact .v.station { font-size: clamp(24px, 6.4vw, 26px); }
+  .fact .d { font-size: 16px; line-height: 1.35; }
+  .fact .c { font: 700 12px/1.3 var(--sans); letter-spacing: .18em; text-transform: uppercase; color: var(--wine); }
+  .fact .dress { font: 600 19px/1.25 var(--serif); }
+  .fact .dress b { color: var(--wine); font-weight: 800; }
+
+  /* ── Visa box (the poster's RSVP) ── */
+  .visa-box {
+    position: relative; display: flex; align-items: center; gap: 16px;
+    border: 1.5px dashed var(--ink); padding: 14px 18px 14px 12px;
+  }
+  .visa-box .stamp { flex: 0 0 auto; width: clamp(74px, 20vw, 96px); height: auto; transform: rotate(-12deg); }
+  .visa-box .vb { display: flex; flex-direction: column; gap: 6px; flex: 1 1 auto; min-width: 0; hyphens: auto; -webkit-hyphens: auto; }
+  .visa-box .vb-main { font: 600 clamp(18px, 4.8vw, 21px)/1.25 var(--serif); }
+  .visa-box .vb-note { font: italic 400 15px/1.4 var(--serif); }
+  .visa-box .print { position: absolute; right: 10px; top: -22px; transform: rotate(18deg); }
+
+  .cta { display: grid; gap: 14px; }
+  .cal { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .cal > span { grid-column: 1 / -1; text-align: center; font: 700 11px/1.3 var(--sans); letter-spacing: .26em; text-transform: uppercase; }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    min-height: 50px; padding: 13px 20px; border: 1.5px solid transparent; border-radius: 2px;
+    font: 700 14px/1.2 var(--sans); letter-spacing: .2em; text-transform: uppercase; text-align: center;
+    text-decoration: none; cursor: pointer; -webkit-tap-highlight-color: transparent;
+    transition: background-color .15s ease, color .15s ease, transform .15s ease;
+  }
+  .btn:active { transform: scale(.98); }
+  .btn-primary { background: var(--wine); color: var(--paper); box-shadow: 0 0 0 1px var(--wine), inset 0 0 0 3px var(--wine), inset 0 0 0 4px rgba(234,216,184,.55); }
+  .btn-primary:hover { background: var(--wine-deep); color: var(--paper); }
+  .btn-ghost { background: transparent; color: var(--ink); border-color: var(--ink); }
+  .btn-ghost:hover { background: rgba(58,36,24,.07); color: var(--ink); }
+  .btn-sm { min-height: 44px; padding: 10px 14px; font-size: 12.5px; letter-spacing: .16em; }
+  .btn-block { width: 100%; }
+  .btn[disabled] { opacity: .65; cursor: progress; }
+
+  /* ── The application document ── */
+  .doc { margin-top: 26px; }
+  .doc-frame { position: relative; border: 3px solid var(--ink); padding: 4px; }
+  .doc-in { border: 1px solid var(--ink); padding: 18px 14px 20px; }
+  @media (min-width: 640px) { .doc-in { padding: 26px 30px 28px; } }
+  .doc-head {
+    display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    font: 700 11px/1.3 var(--sans); letter-spacing: .24em; text-transform: uppercase;
+    border-bottom: 1px solid var(--ink); padding-bottom: 10px; margin-bottom: 18px;
+  }
+  .doc h2 { margin: 0; color: var(--wine); font: italic 600 clamp(32px, 9vw, 44px)/1.05 var(--serif); }
+  .doc .intro { margin: 8px 0 22px; font: italic 400 17px/1.4 var(--serif); }
+  .doc h3.manifest { margin: 0 0 10px; font: 700 12px/1.3 var(--sans); letter-spacing: .3em; text-transform: uppercase; color: var(--rust); }
+  .board { margin: 0 0 24px; padding: 0 0 20px; border-bottom: 1px solid var(--ink); }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+  .chips li {
+    display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px 6px 8px;
+    border: 1.5px solid var(--ink); border-radius: 2px; background: var(--paper-hi);
+    font: 600 15px/1.3 var(--sans);
+  }
+  .chips li::before { content: ""; width: 7px; height: 7px; border-radius: 50%; border: 1.5px solid var(--ink); }
+  .chips .n { color: var(--rust); font-weight: 700; font-size: 13px; }
+  .empty { margin: 0; font: italic 400 16px/1.4 var(--serif); }
+
+  form { margin: 0; }
+  .field { margin: 0 0 24px; }
+  fieldset.field { border: 0; padding: 0; min-width: 0; }
+  .label, legend {
+    display: block; margin: 0 0 8px; padding: 0;
+    font: 700 12px/1.35 var(--sans); letter-spacing: .24em; text-transform: uppercase; color: var(--ink);
+  }
+  .opt { color: var(--ink-soft); font-weight: 400; letter-spacing: .12em; }
+  input[type="text"], textarea {
+    display: block; width: 100%; min-height: 50px; padding: 10px 4px 8px;
+    background: transparent; color: var(--night); border: 0; border-bottom: 1.5px solid var(--ink); border-radius: 0;
+    font: 500 20px/1.3 var(--serif); -webkit-appearance: none; appearance: none;
+  }
+  textarea { min-height: 96px; resize: vertical; border: 1.5px solid var(--ink); padding: 10px 12px; font-size: 18px; line-height: 1.4; }
+  input::placeholder, textarea::placeholder { color: #8C7560; opacity: 1; font-style: italic; }
+  input[type="text"]:focus, textarea:focus { outline: none; border-color: var(--wine); background: rgba(110,20,35,.05); }
+  .invalid input[type="text"], .invalid .seg span { border-color: var(--error); }
+  .hint { margin: 8px 0 0; color: var(--ink-soft); font: italic 400 15px/1.4 var(--serif); }
+  .err { margin: 8px 0 0; color: var(--error); font: 700 14px/1.4 var(--sans); letter-spacing: .02em; }
+  .taken { margin: 8px 0 0; color: var(--wine); font: italic 600 15px/1.4 var(--serif); }
+
+  .seg { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .seg label { position: relative; display: block; cursor: pointer; }
+  .seg input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  .seg span {
+    display: flex; align-items: center; gap: 10px; min-height: 56px; padding: 10px 12px;
+    border: 1.5px solid var(--ink); border-radius: 2px; font: 600 17px/1.2 var(--serif);
+    transition: background-color .15s ease, color .15s ease;
+  }
+  .seg span::before {
+    content: ""; flex: none; width: 18px; height: 18px; border: 1.5px solid currentColor; border-radius: 1px;
+    background: transparent;
+  }
+  .seg input:checked + span { background: var(--wine); border-color: var(--wine); color: var(--paper); }
+  .seg input:checked + span::before { background: var(--paper); box-shadow: inset 0 0 0 3px var(--wine); }
+  .seg input:focus-visible + span { outline: 2px solid var(--wine); outline-offset: 3px; }
+
+  .stepper { display: inline-flex; align-items: center; border: 1.5px solid var(--ink); border-radius: 2px; }
+  .stepper button {
+    width: 52px; height: 48px; border: 0; background: transparent; color: var(--ink);
+    font: 400 26px/1 var(--serif); cursor: pointer;
+  }
+  .stepper button:disabled { color: #A8927A; cursor: default; }
+  .stepper output { min-width: 44px; text-align: center; font: 700 22px/1 var(--serif); }
+
+  .combo-box { position: relative; }
+  .combo .flag { position: absolute; left: 4px; top: 25px; transform: translateY(-50%); font-size: 22px; line-height: 1; pointer-events: none; }
+  .combo input[type="text"] { padding-left: 38px; scroll-margin-top: 16px; }
+  .listbox {
+    position: absolute; z-index: 20; top: 56px; left: 0; right: 0; max-height: 290px; overflow-y: auto;
+    margin: 0; padding: 4px; list-style: none; background: var(--paper-hi); border: 1.5px solid var(--ink);
+    box-shadow: 0 16px 36px rgba(31,21,16,.35); -webkit-overflow-scrolling: touch;
+  }
+  .listbox li {
+    display: flex; align-items: center; gap: 10px; padding: 10px; cursor: pointer;
+    font: 500 18px/1.25 var(--serif);
+  }
+  .listbox li .f { font-size: 20px; width: 26px; text-align: center; flex: none; }
+  .listbox li .tag { margin-left: auto; padding-left: 8px; color: var(--rust); font: 700 11px/1.2 var(--sans); letter-spacing: .16em; text-transform: uppercase; white-space: nowrap; }
+  .listbox li[aria-selected="true"], .listbox li:hover { background: rgba(110,20,35,.1); }
+  .listbox li.custom { font-style: italic; color: var(--wine); }
+
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  .status { margin: 12px 0 0; min-height: 1.2em; font: 600 15px/1.4 var(--sans); }
+  .status.error { color: var(--error); }
+  .form-actions { display: grid; gap: 10px; }
+
+  /* ── The issued visa ── */
+  .visa { position: relative; border: 3px solid var(--ink); padding: 4px; background: var(--paper-hi); animation: issue .5s ease-out; }
+  @keyframes issue { from { opacity: 0; transform: translateY(8px) rotate(-.6deg); } to { opacity: 1; transform: none; } }
+  .visa-in { position: relative; border: 1px solid var(--ink); padding: 16px 14px 14px; }
+  .visa-head {
+    display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+    font: 700 11px/1.3 var(--sans); letter-spacing: .22em; text-transform: uppercase; color: var(--rust);
+    border-bottom: 1px solid var(--ink); padding-bottom: 8px;
+  }
+  .visa-top { position: relative; min-height: 108px; margin: 14px 0 16px; }
+  .visa-stamp { position: absolute; right: -6px; top: -2px; width: 108px; height: 108px; transform: rotate(-14deg); color: var(--rust); opacity: .9; pointer-events: none; }
+  .visa-title { margin: 0; padding: 6px 104px 0 0; color: var(--wine); font: italic 700 clamp(24px, 7vw, 32px)/1.1 var(--serif); overflow-wrap: break-word; }
+  .visa dl { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; margin: 0; }
+  .visa dl > div { min-width: 0; }
+  .visa dl .wide { grid-column: 1 / -1; }
+  .visa dt { font: 700 11px/1.3 var(--sans); letter-spacing: .22em; text-transform: uppercase; color: var(--ink-soft); }
+  .visa dd { margin: 3px 0 0; font: 600 19px/1.25 var(--serif); overflow-wrap: anywhere; white-space: pre-line; color: var(--night); }
+  .visa-meta { margin: 16px 0 6px; padding-top: 12px; border-top: 1px dashed var(--ink); font: 700 12px/1.45 var(--sans); letter-spacing: .14em; text-transform: uppercase; color: var(--wine); }
+  .visa-text { margin: 0 0 14px; font: italic 400 16px/1.45 var(--serif); white-space: pre-line; }
+  .mrz {
+    display: block; margin: 0 0 14px; padding: 8px 6px; background: rgba(58,36,24,.06); overflow: hidden;
+    font: 600 clamp(9px, 2.7vw, 13px)/1.45 var(--mono); letter-spacing: .02em; color: var(--ink); white-space: pre;
+  }
+  .mrz span { display: block; }
+  .pass-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+
+  .fallback { margin: 20px 0 0; padding: 16px; border: 1.5px dashed var(--wine); }
+  .fallback h3 { margin: 0 0 6px; color: var(--wine); font: italic 700 20px/1.2 var(--serif); }
+  .fallback p { margin: 0; font: italic 400 16px/1.4 var(--serif); }
+  .fallback pre {
+    margin: 12px 0; padding: 12px; background: rgba(58,36,24,.07);
+    font: 15px/1.5 var(--sans); white-space: pre-wrap; overflow-wrap: anywhere;
+  }
+  .fallback .row { display: flex; gap: 10px; flex-wrap: wrap; }
+  .notice { margin: 0 0 18px; padding: 12px 14px; border: 1.5px solid var(--wine); color: var(--wine); font: italic 600 16px/1.4 var(--serif); }
+  .closed { margin: 0; font: italic 400 18px/1.4 var(--serif); }
+
+  footer { padding: 26px 0 10px; text-align: center; color: #CDB894; font: 700 12px/1.6 var(--sans); letter-spacing: .24em; text-transform: uppercase; }
+
+  /* ── Narrowest phones (iPhone SE 1st gen and alike) ── */
+  @media (max-width: 419px) {
+    .sheet { padding: 8px; }
+    .frame { padding: 12px 10px 14px; }
+    .doc-in { padding: 16px 10px 18px; }
+    .visa { padding: 3px; }
+    .visa-in { padding: 14px 10px 12px; }
+    .visa-top { min-height: 80px; }
+    .visa-stamp { width: 80px; height: 80px; right: -4px; }
+    .visa-title { padding-right: 72px; }
+    .visa dl { grid-template-columns: 1fr; }
+    .visa-box { flex-direction: column; align-items: flex-start; gap: 10px; padding: 14px; }
+    .visa-box .stamp { width: 78px; }
+  }
+
+  /* ── Motion from the poster ── */
+  @keyframes bkPulse { 0%,100% { transform: scale(1,1); } 50% { transform: scale(1.05,1.09); } }
+  @keyframes bkVein { 0%,100% { opacity: .25; } 50% { opacity: .85; } }
+  @keyframes bkSway { 0%,100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
+  @keyframes bkDrip { 0% { transform: translateY(0); opacity: 0; } 12% { opacity: 1; } 100% { transform: translateY(26px); opacity: 0; } }
+  @keyframes bkWaver { 0%,100% { transform: skewX(0deg); } 50% { transform: skewX(-7deg); } }
+  @keyframes bkSheen { 0%,100% { opacity: .35; } 50% { opacity: .75; } }
+  .bkRoots { transform-box: fill-box; transform-origin: 50% 0%; animation: bkPulse 2.6s ease-in-out infinite; }
+  .bkVeins { animation: bkVein 2.6s ease-in-out infinite; }
+  .bkDoll { transform-box: fill-box; transform-origin: 50% 0%; animation: bkSway 3.4s ease-in-out infinite; }
+  .bkDoll2 { animation-duration: 4.1s; animation-delay: -1.2s; }
+  .bkDoll3 { animation-duration: 2.9s; animation-delay: -2s; }
+  .bkDrop { animation: bkDrip 3.2s ease-in infinite; }
+  .bkDrop2 { animation-delay: -1.6s; }
+  .bkGhost { transform-box: fill-box; transform-origin: 50% 0%; animation: bkWaver 4.5s ease-in-out infinite; }
+  .bkSheen { animation: bkSheen 5s ease-in-out infinite; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+<div class="table">
+  <nav class="langs" aria-label="Language">
+    <button type="button" data-lang="en" aria-label="English">EN</button>
+    <button type="button" data-lang="fr" aria-label="Français">FR</button>
+    <button type="button" data-lang="ru" aria-label="Русский">RU</button>
+  </nav>
+
+  <article class="sheet" aria-labelledby="eye">
+    <div class="frame">
+      <div class="strip">
+        <span data-t="bureau">Baikal Tourist Bureau</span>
+        <svg class="diamond" width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><rect x="1.5" y="1.5" width="7" height="7" transform="rotate(45 5 5)" fill="#6E1423"></rect></svg>
+        <span data-t="line">Trans-Siberian Line · Season 1891–2026</span>
+      </div>
+
+      <p class="visit" id="visit"><span class="crossed"><span id="visit-word">Visit</span><svg class="scribble" viewBox="0 0 170 46" preserveAspectRatio="none" aria-hidden="true"><defs><filter id="bkCharcoal" x="-10%" y="-40%" width="120%" height="180%"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed="3" result="cn"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="cn" scale="3" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter></defs><g filter="url(#bkCharcoal)" fill="none" stroke="#1C1614" stroke-linecap="round" stroke-linejoin="round" opacity="0.92"><path d="M2 26 L20 12 L34 31 L52 10 L66 33 L84 8 L98 31 L118 11 L132 33 L150 13 L168 26" stroke-width="3.4" vector-effect="non-scaling-stroke"></path><path d="M4 19 C40 31 80 6 120 24 C140 33 156 15 168 20" stroke-width="2.6" vector-effect="non-scaling-stroke"></path><path d="M6 35 L30 21 L48 39 L74 17 L96 37 L124 19 L146 37 L166 28" stroke-width="2" vector-effect="non-scaling-stroke"></path><path d="M10 28 C60 22 110 32 160 24" stroke-width="1.4" vector-effect="non-scaling-stroke"></path></g></svg><span class="scrawl" id="scrawl">never leave</span></span> <span id="visit-rest">Siberia!</span></p>
+
+      <figure class="plate"><div class="plate-in">
+<svg id="plate-svg" viewBox="0 0 836 620" role="img" aria-label="Vintage view of frozen Lake Baikal at sunset, a steam train running along the far shore under a flaming sky">
+<defs>
+<linearGradient id="bkSky" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#2E0A14"></stop>
+<stop offset="0.3" stop-color="#5E1020"></stop>
+<stop offset="0.52" stop-color="#93261F"></stop>
+<stop offset="0.7" stop-color="#C24A24"></stop>
+<stop offset="0.84" stop-color="#E3843A"></stop>
+<stop offset="0.94" stop-color="#F2B45C"></stop>
+<stop offset="1" stop-color="#F7D08A"></stop>
+</linearGradient>
+<radialGradient id="bkSunGlow" cx="540" cy="266" r="250" gradientUnits="userSpaceOnUse">
+<stop offset="0" stop-color="#FFE7AE" stop-opacity="0.95"></stop>
+<stop offset="0.22" stop-color="#F7B35A" stop-opacity="0.55"></stop>
+<stop offset="1" stop-color="#C2502A" stop-opacity="0"></stop>
+</radialGradient>
+<linearGradient id="bkIce" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#F4C27A"></stop>
+<stop offset="0.07" stop-color="#E39249"></stop>
+<stop offset="0.22" stop-color="#B4552F"></stop>
+<stop offset="0.45" stop-color="#6E2A2C"></stop>
+<stop offset="0.75" stop-color="#3C1A22"></stop>
+<stop offset="1" stop-color="#22100F"></stop>
+</linearGradient>
+<linearGradient id="bkSunRefl" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="#FFE3A6" stop-opacity="0.8"></stop>
+<stop offset="1" stop-color="#FFE3A6" stop-opacity="0"></stop>
+</linearGradient>
+<linearGradient id="bkOil" x1="0" y1="0" x2="1" y2="0.6">
+<stop offset="0" stop-color="#7B3FB8"></stop>
+<stop offset="0.25" stop-color="#1F9C8A"></stop>
+<stop offset="0.5" stop-color="#D9B23A"></stop>
+<stop offset="0.75" stop-color="#B8264F"></stop>
+<stop offset="1" stop-color="#3F5FD0"></stop>
+</linearGradient>
+<radialGradient id="bkVig" cx="0.5" cy="0.46" r="0.78">
+<stop offset="0.55" stop-color="#1A0A0C" stop-opacity="0"></stop>
+<stop offset="1" stop-color="#1A0A0C" stop-opacity="0.6"></stop>
+</radialGradient>
+<filter id="bkOoze" x="-20%" y="-40%" width="140%" height="180%">
+<feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="3" seed="7" result="on"></feTurbulence>
+<feDisplacementMap in="SourceGraphic" in2="on" scale="18" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
+</filter>
+<filter id="bkGrain" x="0" y="0" width="100%" height="100%">
+<feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"></feTurbulence>
+<feColorMatrix type="saturate" values="0"></feColorMatrix>
+</filter>
+<pattern id="bkPinesA" x="0" y="326" width="11" height="14" patternUnits="userSpaceOnUse"><path d="M5.5 0 L10 14 L1 14 Z" fill="#2A0E12"></path></pattern>
+<pattern id="bkPinesB" x="4" y="331" width="8" height="9" patternUnits="userSpaceOnUse"><path d="M4 0 L7.5 9 L0.5 9 Z" fill="#1E0A0D"></path></pattern>
+<g id="bkRanges">
+<path d="M0 300 L60 262 L110 280 L170 236 L230 270 L290 248 L350 284 L420 252 L480 290 L560 268 L640 240 L700 262 L760 232 L836 258 L836 342 L0 342 Z" fill="#85363C"></path>
+<path d="M170 236 L160 242 L166 243 L170 240 L175 244 L180 242 Z M640 240 L630 246 L636 247 L641 244 L646 248 L650 245 Z M760 232 L748 239 L755 240 L761 236 L767 241 L772 238 Z" fill="#F3C9A0" opacity="0.6"></path>
+<path d="M0 318 L80 292 L140 306 L210 284 L300 312 L380 298 L460 320 L540 334 L620 318 L700 302 L780 314 L836 298 L836 342 L0 342 Z" fill="#4A171D"></path>
+</g>
+<path id="bkTuft" d="M-18 0 L-10 -3 L-14 -7 L-4 -4 L-6 -9 L2 -4 L4 -9 L8 -3 L14 -6 L12 -1 L19 0 L12 2 L15 6 L6 3 L4 8 L0 3 L-6 8 L-6 3 L-14 6 L-10 2 Z"></path>
+<path id="bkCedar" d="M0 0 L10 24 L6 24 L20 48 L12 48 L30 76 L20 76 L40 106 L28 106 L50 138 L36 138 L58 172 L4 165 L4 210 L-4 210 L-4 165 L-58 172 L-36 138 L-50 138 L-28 106 L-40 106 L-20 76 L-30 76 L-12 48 L-20 48 L-6 24 L-10 24 Z"></path>
+<g id="bkDoll">
+<line x1="0" y1="0" x2="0" y2="10" stroke="#E9D2AE" stroke-width="0.6" opacity="0.75"></line>
+<circle cx="0" cy="12.6" r="2.3" fill="none" stroke="#1C0E0A" stroke-width="1.2"></circle>
+<path d="M0 15 L0 24 M-5 16.5 L1 17.5 L5 18.8 M0 24 L-3.5 30 M0 24 L3 30.5 M-1.6 19.5 L1.6 20.5" fill="none" stroke="#1C0E0A" stroke-width="1.2" stroke-linecap="round"></path>
+<path d="M-1.8 18 L1.8 18" stroke="#B8264F" stroke-width="1" opacity="0.8"></path>
+</g>
+<g id="bkDeer" fill="#1A0B0D">
+<ellipse cx="0" cy="-7" rx="3.2" ry="7.5"></ellipse>
+<path d="M-2.4 -1 L-3.4 12 L-1.8 12 L-0.6 -1 Z M2.4 -1 L3.4 12 L1.8 12 L0.6 -1 Z"></path>
+<path d="M-2 -12 C-6 -10 -7 -6 -6 -2 M2 -12 C5 -9 6 -6 5 -2" fill="none" stroke="#1A0B0D" stroke-width="1.3" stroke-linecap="round"></path>
+<path d="M-1 -14 L1 -14 L2 -18 L0 -18 Z"></path>
+<ellipse cx="1.4" cy="-20.5" rx="2.3" ry="2.9"></ellipse>
+<path d="M2.6 -21.5 L5 -20 L2.8 -18.8 Z"></path>
+<g fill="none" stroke="#1A0B0D" stroke-width="0.6" stroke-linecap="round">
+<path d="M0 -23 C-6 -26 -9 -20 -12 -14 C-13 -10 -12 -6 -14 -2"></path>
+<path d="M2 -23 C8 -27 11 -20 13 -13 C14 -9 13 -5 15 0"></path>
+<path d="M-9 -20 C-12 -22 -14 -19 -16 -18 M10 -21 C13 -23 15 -21 17 -22 M-12 -14 C-15 -13 -16 -10 -18 -10 M13 -13 C16 -12 17 -9 19 -9 M-13 -8 C-15 -6 -14 -3 -16 -1 M14 -6 C16 -4 15 -1 17 1"></path>
+</g>
+</g>
+</defs>
+
+<rect x="0" y="0" width="836" height="342" fill="url(#bkSky)"></rect>
+<path d="M-10 92 C120 70 260 104 400 88 C520 74 640 96 846 78 L846 104 C700 118 560 110 420 118 C280 126 140 108 -10 122 Z" fill="#4A0D19" opacity="0.55"></path>
+<path d="M120 178 C260 166 380 186 520 176 C620 170 720 182 846 172 L846 186 C720 196 600 188 500 194 C380 200 240 190 120 196 Z" fill="#B8432A" opacity="0.45"></path>
+<path d="M-10 222 C140 212 300 232 470 222 L470 232 C300 242 140 228 -10 236 Z" fill="#E98A45" opacity="0.45"></path>
+<path d="M600 236 C680 228 770 240 846 232 L846 242 C770 248 680 244 600 246 Z" fill="#F4B862" opacity="0.5"></path>
+<circle cx="540" cy="266" r="250" fill="url(#bkSunGlow)"></circle>
+<circle cx="540" cy="266" r="36" fill="#FBD991"></circle>
+<rect x="490" y="258" width="100" height="2.5" fill="#E98A45" opacity="0.7"></rect>
+<rect x="500" y="250" width="80" height="1.8" fill="#E98A45" opacity="0.55"></rect>
+
+<use href="#bkRanges"></use>
+<rect x="330" y="326" width="506" height="14" fill="url(#bkPinesA)"></rect>
+<rect x="330" y="331" width="506" height="9" fill="url(#bkPinesB)"></rect>
+
+<path d="M0 322 L300 322 C318 324 330 332 338 342 L0 342 Z" fill="#2A0E12"></path>
+<line x1="0" y1="322.5" x2="300" y2="322.5" stroke="#8A5440" stroke-width="0.8"></line>
+<path d="M256 304 C246 290 226 292 214 280 C200 266 170 272 150 262 C130 252 104 258 88 248" fill="none" stroke="#EFC09A" stroke-width="7" stroke-linecap="round" opacity="0.4"></path>
+<path d="M256 304 C250 296 240 294 232 288 C220 280 204 282 192 276" fill="none" stroke="#FBE1C2" stroke-width="3" stroke-linecap="round" opacity="0.45"></path>
+<g fill="#160809">
+<rect x="60" y="312" width="34" height="9"></rect>
+<rect x="98" y="312" width="34" height="9"></rect>
+<rect x="136" y="312" width="34" height="9"></rect>
+<rect x="174" y="312" width="34" height="9"></rect>
+<rect x="212" y="312" width="34" height="9"></rect>
+<rect x="250" y="310" width="24" height="11"></rect>
+<rect x="268" y="305" width="12" height="16"></rect>
+<rect x="254" y="303" width="4" height="7"></rect>
+<path d="M280 312 L288 321 L280 321 Z"></path>
+</g>
+<g fill="#FFC861">
+<rect x="65" y="314" width="4" height="3"></rect><rect x="72" y="314" width="4" height="3"></rect><rect x="79" y="314" width="4" height="3"></rect><rect x="86" y="314" width="4" height="3"></rect>
+<rect x="103" y="314" width="4" height="3"></rect><rect x="110" y="314" width="4" height="3"></rect><rect x="117" y="314" width="4" height="3"></rect><rect x="124" y="314" width="4" height="3"></rect>
+<rect x="141" y="314" width="4" height="3"></rect><rect x="148" y="314" width="4" height="3"></rect><rect x="155" y="314" width="4" height="3"></rect><rect x="162" y="314" width="4" height="3"></rect>
+<rect x="179" y="314" width="4" height="3"></rect><rect x="186" y="314" width="4" height="3"></rect><rect x="193" y="314" width="4" height="3"></rect><rect x="200" y="314" width="4" height="3"></rect>
+<rect x="217" y="314" width="4" height="3"></rect><rect x="224" y="314" width="4" height="3"></rect><rect x="231" y="314" width="4" height="3"></rect><rect x="238" y="314" width="4" height="3"></rect>
+<rect x="271" y="308" width="6" height="4"></rect>
+</g>
+<path d="M26 322 L26 307 Q41 293 56 307 L56 322 Z" fill="#0E0507" stroke="#8A5440" stroke-width="1"></path>
+
+<rect x="0" y="341" width="836" height="279" fill="url(#bkIce)"></rect>
+<rect x="0" y="340" width="836" height="1.6" fill="#F7D08A" opacity="0.75"></rect>
+<use href="#bkRanges" transform="translate(0 682) scale(1 -1)" opacity="0.25"></use>
+<ellipse cx="540" cy="347" rx="80" ry="6" fill="#FFE3A6" opacity="0.5"></ellipse>
+<rect x="522" y="344" width="36" height="140" fill="url(#bkSunRefl)"></rect>
+<g fill="#FFE3A6">
+<rect x="510" y="350" width="60" height="2" opacity="0.8"></rect>
+<rect x="516" y="360" width="48" height="2" opacity="0.7"></rect>
+<rect x="523" y="372" width="34" height="1.6" opacity="0.6"></rect>
+<rect x="528" y="386" width="24" height="1.4" opacity="0.5"></rect>
+<rect x="532" y="402" width="16" height="1.2" opacity="0.4"></rect>
+<rect x="535" y="420" width="10" height="1" opacity="0.3"></rect>
+</g>
+
+<g fill="#8FC6C4">
+<path d="M230 470 L330 446 L420 468 L420 520 L330 540 L250 520 Z" opacity="0.14"></path>
+<path d="M520 450 L610 470 L640 512 L560 500 Z" opacity="0.12"></path>
+<path d="M140 452 L170 410 L260 400 L360 410 L330 446 L230 470 Z" opacity="0.08"></path>
+<path d="M640 512 L700 480 L760 494 L780 548 L700 560 Z" opacity="0.1"></path>
+</g>
+<g fill="none" stroke="#FCE9CF" stroke-width="0.9" stroke-linejoin="round" opacity="0.55">
+<path d="M60 470 L140 452 L230 470 L330 446 L420 468 L520 450 L610 470"></path>
+<path d="M230 470 L250 520 L330 540 L420 520 L470 560 L520 620"></path>
+<path d="M330 446 L360 410 L450 398 L520 412 L600 396"></path>
+<path d="M520 450 L560 500 L640 512 L700 560 L780 548 L836 566"></path>
+<path d="M420 468 L420 520"></path>
+<path d="M140 452 L170 410 L260 400 L360 410"></path>
+<path d="M640 512 L700 480 L760 494"></path>
+<path d="M560 500 L590 560 L640 600"></path>
+</g>
+<g stroke="#FFF3DE" stroke-width="0.8" fill="#FFF3DE" fill-opacity="0.25" opacity="0.8">
+<circle cx="300" cy="500" r="3"></circle><circle cx="302" cy="490" r="2.2"></circle><circle cx="299" cy="482" r="1.6"></circle><circle cx="301" cy="476" r="1.1"></circle>
+<circle cx="470" cy="430" r="2.6"></circle><circle cx="472" cy="422" r="1.8"></circle><circle cx="471" cy="416" r="1.2"></circle>
+<circle cx="610" cy="540" r="3.2"></circle><circle cx="612" cy="529" r="2.4"></circle><circle cx="609" cy="520" r="1.6"></circle><circle cx="611" cy="514" r="1"></circle>
+<circle cx="390" cy="590" r="3"></circle><circle cx="393" cy="579" r="2"></circle><circle cx="391" cy="571" r="1.4"></circle>
+<circle cx="200" cy="420" r="2.4"></circle><circle cx="202" cy="412" r="1.6"></circle><circle cx="201" cy="406" r="1"></circle>
+</g>
+<g fill="#0A0405" stroke="#4B3A55" stroke-width="0.6">
+<circle cx="205" cy="532" r="3"></circle><circle cx="207" cy="522" r="2"></circle><circle cx="204" cy="515" r="1.4"></circle>
+<circle cx="236" cy="508" r="2.2"></circle><circle cx="238" cy="501" r="1.4"></circle>
+</g>
+
+<use href="#bkDeer" transform="translate(372 396) scale(1 -1)" opacity="0.3"></use>
+<use href="#bkDeer" transform="translate(372 372)"></use>
+
+<g transform="translate(456 0)">
+<g fill="#160909">
+<circle cx="0" cy="466" r="4.2"></circle>
+<path d="M-5 464 C-4.5 458.5 4.5 458.5 5 464 L5.5 468.5 L4 468.5 L4 465 L-4 465 L-4 468.5 L-5.5 468.5 Z"></path>
+<path d="M-4 471 L4 471 L6 486 L3 486 L3 498 L1 498 L0 488 L-1 498 L-3 498 L-3 486 L-6 486 Z"></path>
+</g>
+<path d="M-4 473 L-7 484 M4 473 L7 484" stroke="#160909" stroke-width="1.6" stroke-linecap="round"></path>
+<g class="bkGhost" opacity="0.62">
+<g fill="#0B0506">
+<path d="M-2 498 L-3 540 L-1 540 L0 500 Z"></path>
+<path d="M2 498 L5 540 L7 540 L3 499 Z"></path>
+<path d="M-6 540 C-6 556 -2 566 -4 576 L8 576 C6 566 10 556 9 540 Z"></path>
+<ellipse cx="8" cy="594" rx="4" ry="7" transform="rotate(25 8 594)"></ellipse>
+</g>
+<path d="M2 576 L6 588 M-5 544 C-18 556 -22 572 -36 586 C-42 592 -44 600 -48 606 M8 544 C24 552 32 570 46 580 C52 586 58 590 64 600 M-48 606 L-52 610 M-48 606 L-49 612 M-48 606 L-45 611 M64 600 L69 603 M64 600 L66 606 M64 600 L62 606" fill="none" stroke="#0B0506" stroke-width="1.3" stroke-linecap="round"></path>
+</g>
+</g>
+
+<path d="M604 456 Q650 470 704 474 Q770 482 836 476 L836 492 Q760 498 700 490 Q648 486 604 456 Z" fill="#24100F" opacity="0.35"></path>
+<g transform="translate(720 473)">
+<g class="bkRoots">
+<path d="M-5 0 C-6 30 -2 60 -8 90 C-12 110 -6 128 -10 140 L-7 140 C-2 126 -6 108 -2 90 C4 60 2 30 5 0 Z" fill="#0A0405"></path>
+<g fill="none" stroke="#0A0405" stroke-linecap="round">
+<path d="M-3 10 C-30 22 -40 44 -62 52 C-74 56 -80 70 -92 74" stroke-width="3"></path>
+<path d="M2 14 C26 28 44 30 56 52 C64 66 80 70 86 86" stroke-width="3"></path>
+<path d="M-6 40 C-24 56 -22 80 -40 96 C-50 104 -48 118 -58 126" stroke-width="2"></path>
+<path d="M0 50 C18 64 14 88 30 104 C38 112 36 126 44 134" stroke-width="2"></path>
+<path d="M-8 80 C-20 96 -14 114 -26 130 M-2 96 C8 110 4 124 12 140" stroke-width="1.4"></path>
+<path d="M-62 52 C-70 66 -64 78 -72 90 M56 52 C70 58 76 48 90 54 M-40 96 C-52 92 -60 100 -70 98 M30 104 C42 100 50 108 60 104 M-92 74 C-98 80 -96 88 -102 92 M86 86 C90 94 88 100 94 106" stroke-width="0.8"></path>
+</g>
+<g class="bkVeins" fill="none" stroke="#B8264F" stroke-width="0.8" stroke-linecap="round">
+<path d="M-3 12 C-28 24 -38 44 -60 52"></path>
+<path d="M2 16 C24 30 42 32 54 52"></path>
+<path d="M-1 20 C-3 50 0 70 -5 100"></path>
+</g>
+</g>
+</g>
+<path d="M604 456 Q640 432 690 438 Q756 426 836 440 L836 474 Q770 480 704 472 Q650 476 604 456 Z" fill="#24100F"></path>
+<path d="M612 452 Q640 436 690 441 Q756 430 836 443" fill="none" stroke="#F0C996" stroke-width="1.5" opacity="0.45"></path>
+<use href="#bkCedar" transform="translate(652 362) scale(0.4)" fill="#1E0D0E"></use>
+<use href="#bkCedar" transform="translate(800 350) scale(0.42)" fill="#1E0D0E"></use>
+<use href="#bkCedar" transform="translate(720 232)" fill="#1C0C0D"></use>
+<use href="#bkCedar" transform="translate(720 232)" fill="none" stroke="#F2A85A" stroke-width="0.8" opacity="0.3"></use>
+
+<path d="M118 620 C112 596 132 566 182 552 C226 540 286 548 332 568 C364 582 392 602 402 620 Z" fill="#0B0506" filter="url(#bkOoze)"></path>
+<g class="bkSheen" style="mix-blend-mode: screen">
+<ellipse cx="262" cy="594" rx="92" ry="17" transform="rotate(-6 262 594)" fill="url(#bkOil)" opacity="0.55" filter="url(#bkOoze)"></ellipse>
+<ellipse cx="200" cy="608" rx="50" ry="8" fill="url(#bkOil)" opacity="0.4"></ellipse>
+<path d="M200 580 C230 572 270 574 300 584 M240 600 C270 594 310 598 340 608 M176 596 C190 590 206 590 218 594" fill="none" stroke="url(#bkOil)" stroke-width="1.5" stroke-linecap="round"></path>
+</g>
+<g fill="none" stroke="#0B0506" stroke-linejoin="round" stroke-linecap="round">
+<path d="M180 554 L168 524 L174 500 L140 452" stroke-width="1.8"></path>
+<path d="M262 546 L274 514 L250 520 L230 470" stroke-width="1.6"></path>
+<path d="M334 570 L372 552 L420 520" stroke-width="1.7"></path>
+<path d="M300 548 L318 532 L330 540" stroke-width="1.2"></path>
+<path d="M372 552 L396 560 L430 556" stroke-width="1"></path>
+</g>
+<g fill="#0B0506">
+<circle cx="350" cy="560" r="4"></circle><circle cx="372" cy="548" r="2.5"></circle><circle cx="160" cy="548" r="3"></circle><circle cx="300" cy="540" r="2"></circle>
+<circle cx="172" cy="512" r="2"></circle><circle cx="268" cy="528" r="2.4"></circle><circle cx="396" cy="538" r="2.2"></circle>
+</g>
+<g fill="#9C7BE0" opacity="0.85">
+<circle cx="349" cy="558.6" r="1"></circle><circle cx="171.4" cy="511.4" r="0.7"></circle><circle cx="267.3" cy="527.3" r="0.8"></circle><circle cx="395.4" cy="537.4" r="0.7"></circle><circle cx="159.2" cy="546.8" r="0.8"></circle>
+</g>
+
+<path d="M0 380 C40 384 80 400 104 430 C126 458 120 500 98 540 C80 572 60 600 54 620 L0 620 Z" fill="#150909"></path>
+<path d="M0 383 C40 387 78 402 100 430" fill="none" stroke="#E9C9A6" stroke-width="1.4" opacity="0.3"></path>
+
+<path d="M92 520 C100 460 80 420 104 370 C124 330 96 280 124 230 C140 200 130 150 150 100 L156 100 C138 152 148 202 132 234 C106 284 132 332 112 372 C90 420 110 462 102 520 Z" fill="#24100F"></path>
+<g fill="none" stroke="#24100F" stroke-width="3" stroke-linecap="round">
+<path d="M130 238 C160 246 190 232 214 244 C232 252 246 248 262 246"></path>
+<path d="M118 300 C148 312 170 296 196 312 C210 320 214 336 204 344"></path>
+<path d="M140 160 C168 150 186 166 206 152 C220 142 214 128 202 134"></path>
+<path d="M108 360 C130 372 150 360 168 378 C176 386 172 396 164 394"></path>
+<path d="M150 104 C140 90 146 76 136 66"></path>
+</g>
+<g fill="#24100F">
+<use href="#bkTuft" transform="translate(176 240) scale(1.2)"></use>
+<use href="#bkTuft" transform="translate(214 246) rotate(8)"></use>
+<use href="#bkTuft" transform="translate(150 302) scale(1.2)"></use>
+<use href="#bkTuft" transform="translate(186 306) rotate(-10)"></use>
+<use href="#bkTuft" transform="translate(170 156) scale(1.1)"></use>
+<use href="#bkTuft" transform="translate(198 146) rotate(-12)"></use>
+<use href="#bkTuft" transform="translate(140 366) scale(1.1) rotate(6)"></use>
+<use href="#bkTuft" transform="translate(146 96) rotate(-70)"></use>
+<use href="#bkTuft" transform="translate(112 236) scale(1.2)"></use>
+<use href="#bkTuft" transform="translate(104 300) scale(1.1)"></use>
+</g>
+
+<path d="M26 620 C34 500 22 400 40 300 C52 230 38 160 50 30 L58 30 C50 160 66 232 54 302 C40 400 50 500 46 620 Z" fill="#120707"></path>
+<g fill="none" stroke="#120707" stroke-width="4" stroke-linecap="round">
+<path d="M50 80 C80 70 96 90 112 78 C126 68 120 52 108 56"></path>
+<path d="M48 140 C90 132 120 150 150 132 C168 120 176 136 166 148 C158 156 148 150 150 142"></path>
+<path d="M46 210 C96 214 130 196 170 214 C196 226 214 210 206 196"></path>
+<path d="M44 280 C90 292 120 276 150 296 C172 310 192 300 196 286"></path>
+<path d="M50 110 C26 104 12 120 -6 112 M46 180 C24 174 10 190 -6 184 M44 250 C22 246 10 262 -6 256 M42 340 C22 336 10 350 -6 346"></path>
+</g>
+<g fill="#120707">
+<use href="#bkTuft" transform="translate(80 74) scale(1.2) rotate(-10)"></use>
+<use href="#bkTuft" transform="translate(104 64) rotate(20)"></use>
+<use href="#bkTuft" transform="translate(96 138) scale(1.3)"></use>
+<use href="#bkTuft" transform="translate(132 140) scale(1.1) rotate(-15)"></use>
+<use href="#bkTuft" transform="translate(100 208) scale(1.4) rotate(5)"></use>
+<use href="#bkTuft" transform="translate(146 206) scale(1.2) rotate(-8)"></use>
+<use href="#bkTuft" transform="translate(188 214) rotate(15)"></use>
+<use href="#bkTuft" transform="translate(90 286) scale(1.4)"></use>
+<use href="#bkTuft" transform="translate(140 292) scale(1.2) rotate(10)"></use>
+<use href="#bkTuft" transform="translate(180 302) rotate(-12)"></use>
+<use href="#bkTuft" transform="translate(54 36) scale(1.2) rotate(-80)"></use>
+<use href="#bkTuft" transform="translate(14 110) scale(1.3)"></use>
+<use href="#bkTuft" transform="translate(16 182) scale(1.4)"></use>
+<use href="#bkTuft" transform="translate(12 254) scale(1.5)"></use>
+<use href="#bkTuft" transform="translate(16 344) scale(1.4)"></use>
+</g>
+
+<g transform="translate(124 72)"><g class="bkDoll"><use href="#bkDoll"></use></g></g>
+<g transform="translate(160 140)"><g class="bkDoll bkDoll2"><use href="#bkDoll" transform="scale(0.85)"></use></g></g>
+<g transform="translate(184 216)"><g class="bkDoll bkDoll3"><use href="#bkDoll"></use></g></g>
+<g transform="translate(204 136)"><g class="bkDoll bkDoll3"><use href="#bkDoll" transform="scale(0.75)"></use></g></g>
+<g transform="translate(192 308)"><g class="bkDoll bkDoll2"><use href="#bkDoll" transform="scale(0.9)"></use></g></g>
+<g transform="translate(66 282)"><g class="bkDoll"><use href="#bkDoll" transform="scale(0.8)"></use></g></g>
+
+<g transform="translate(248 234)">
+<path d="M-11 6 L-22 12 L-20 7 L-24 5 L-12 3 Z" fill="#5C4A33"></path>
+<path d="M-12 6 C-12 -2 -4 -8 4 -6 C10 -5 12 0 11 5 C9 11 0 13 -6 11 C-9 10 -11 8 -12 6 Z" fill="#7A6446"></path>
+<circle cx="7" cy="-7" r="5.5" fill="#7A6446"></circle>
+<path d="M12 -8 L17 -7 L12 -5.5 Z" fill="#2A1A10"></path>
+<path d="M9 -4 C12 -3 13 1 10 3 C8 2 7 -1 9 -4 Z" fill="#E0283F"></path>
+<path d="M3 -10.5 L11 -9.5" stroke="#F4E6D0" stroke-width="1" stroke-linecap="round"></path>
+<circle cx="9" cy="-7.5" r="1.1" fill="#120707"></circle>
+<path d="M9 -6.5 C9.3 -4.8 8.8 -3.4 9.2 -2" fill="none" stroke="#0B0506" stroke-width="0.8" stroke-linecap="round"></path>
+<path d="M-6 0 C-2 -3 4 -2 6 2 C2 4 -3 4 -6 0 Z" fill="#5C4A33"></path>
+<path d="M-2 4 C-2.2 7 -1 10 -2 13" fill="none" stroke="#0B0506" stroke-width="1.5" stroke-linecap="round"></path>
+<path d="M-1 10 L-2 13.5 M3 10 L3 13.5" stroke="#2A1A10" stroke-width="0.9"></path>
+<ellipse class="bkDrop" cx="-2" cy="16" rx="1.1" ry="2" fill="#0B0506"></ellipse>
+<ellipse class="bkDrop bkDrop2" cx="-2" cy="16" rx="0.9" ry="1.7" fill="#0B0506"></ellipse>
+<path d="M-10 13 C-6 12 0 14 6 13" fill="none" stroke="#0B0506" stroke-width="1.6" opacity="0.8"></path>
+</g>
+
+<rect x="0" y="0" width="836" height="620" fill="url(#bkVig)"></rect>
+<rect x="0" y="0" width="836" height="620" filter="url(#bkGrain)" opacity="0.14" style="mix-blend-mode: multiply"></rect>
+</svg>
+      </div></figure>
+
+      <div class="titles">
+        <p class="stay" data-t="stay">An Unforgettable Stay at Lake Baikal</p>
+        <div class="divider" aria-hidden="true"><span></span><svg width="10" height="10" viewBox="0 0 10 10"><rect x="1.5" y="1.5" width="7" height="7" transform="rotate(45 5 5)" fill="#6E1423"></rect></svg><span></span></div>
+        <h1 class="eye" id="eye" data-t="eye">The Eye of Siberia</h1>
+      </div>
+
+      <div class="expedition">
+        <p class="exp" id="expedition">Vika’s Birthday Expedition</p>
+        <p class="game"><span data-t="game">An original role-playing game:</span> <span class="tears"><span data-t="gameTitle">The Black Tears of Baikal</span><svg viewBox="0 0 260 18" preserveAspectRatio="none" aria-hidden="true"><g fill="#120709"><path d="M33 0 C33 5 31 8 31.5 11 C32 14 36 14 36.5 11 C37 8 35 5 35 0 Z"></path><path d="M121 0 C121 7 119.5 11 120 15 C120.5 18 124 18 124.5 15 C125 11 123 7 123 0 Z"></path><path d="M206 0 C206 3 205 5 205.4 7 C205.8 9 208.6 9 208.8 7 C209 5 208 3 208 0 Z"></path></g><g fill="#9C7BE0" opacity="0.7"><circle cx="33" cy="11" r="0.7"></circle><circle cx="121.3" cy="15" r="0.7"></circle></g></svg></span></p>
+      </div>
+
+      <div class="facts">
+        <div class="fact">
+          <span class="k" data-t="departure">Departure</span>
+          <span class="v" id="dep-date">October 31</span>
+          <span class="d" id="dep-time">The convoy departs at 7:00 p.m. sharp.</span>
+          <span class="c" id="countdown"></span>
+        </div>
+        <div class="fact">
+          <span class="k" data-t="boarding">Boarding point</span>
+          <span class="v station" data-t="station">Listvyanka Station</span>
+          <span class="d" id="where">Villejuif</span>
+        </div>
+        <div class="fact">
+          <span class="k" data-t="dresscode">Dress code</span>
+          <span class="dress"><b data-t="dress1a">Dress as one country</b> <span data-t="dress1b">of your choice.</span></span>
+          <span class="dress"><b data-t="dress2a">Bring your favourite dish</b> <span data-t="dress2b">to share on the long journey.</span></span>
+        </div>
+      </div>
+
+      <div class="visa-box">
+        <svg class="stamp" viewBox="0 0 100 100" aria-hidden="true">
+          <defs>
+            <path id="bkStampRing" d="M50 50 m-39 0 a39 39 0 1 1 78 0 a39 39 0 1 1 -78 0"></path>
+            <filter id="bkWorn" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="2" seed="11" result="wn"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="wn" scale="2.2" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter>
+          </defs>
+          <g filter="url(#bkWorn)" opacity="0.88" fill="#8E2418">
+            <circle cx="50" cy="50" r="47" fill="none" stroke="#8E2418" stroke-width="3"></circle>
+            <circle cx="50" cy="50" r="32" fill="none" stroke="#8E2418" stroke-width="1.2"></circle>
+            <text class="ring" font-size="9.5" font-weight="700" letter-spacing="1.4"><textPath href="#bkStampRing" textLength="240" id="stamp-ring">TOURIST VISA • LAKE BAIKAL •</textPath></text>
+            <text class="big" x="50" y="50" text-anchor="middle" font-size="17" font-weight="800">RSVP</text>
+            <text class="ring" x="50" y="63" text-anchor="middle" font-size="8" font-weight="700" letter-spacing="1" id="stamp-by">BY 17 · X</text>
+          </g>
+        </svg>
+        <div class="vb">
+          <span class="vb-main" id="visa-by">Please validate your tourist visa before October 17.</span>
+          <span class="vb-note" data-t="disclaimer">The agency declines all responsibility for travellers caught by the Spawn of the Forest.</span>
+        </div>
+        <svg class="print" width="56" height="64" viewBox="0 0 56 64" aria-hidden="true">
+          <g fill="none" stroke="#1C1614" stroke-linecap="round" opacity="0.32">
+            <ellipse cx="28" cy="32" rx="22" ry="27" stroke-width="2.2"></ellipse>
+            <ellipse cx="28" cy="33" rx="17" ry="21" stroke-width="2"></ellipse>
+            <ellipse cx="27" cy="34" rx="12" ry="15" stroke-width="2"></ellipse>
+            <ellipse cx="27" cy="35" rx="7" ry="9" stroke-width="2"></ellipse>
+            <ellipse cx="27" cy="36" rx="2.5" ry="4" stroke-width="2"></ellipse>
+          </g>
+        </svg>
+      </div>
+
+      <div class="cta">
+        <a class="btn btn-primary btn-block" href="#rsvp" data-t="apply">Apply for a visa</a>
+        <div class="cal">
+          <span data-t="calendar">Add to calendar</span>
+          <a class="btn btn-ghost btn-sm" id="cal-google" href="#" target="_blank" rel="noopener" data-t="calGoogle">Google</a>
+          <a class="btn btn-ghost btn-sm" id="cal-ics" href="party-en.ics" data-t="calApple">Apple · Outlook</a>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <section class="sheet doc" id="rsvp" aria-labelledby="rsvp-h">
+    <div class="doc-frame"><div class="doc-in">
+      <div class="doc-head"><span data-t="bureau">Baikal Tourist Bureau</span><span data-t="formNo">Form V-31</span></div>
+      <h2 id="rsvp-h" data-t="formTitle">Visa application</h2>
+      <p class="intro" data-t="formIntro">One form per group of travellers. You can come back and change it.</p>
+
+      <div class="board" id="map" hidden>
+        <h3 class="manifest" data-t="mapTitle">Countries already on board</h3>
+        <ul class="chips" id="chips"></ul>
+        <p class="empty" id="chips-empty" data-t="mapEmpty" hidden></p>
+      </div>
+
+      <p class="notice" id="notice" hidden></p>
+
+      <div class="visa" id="pass" hidden>
+        <div class="visa-in">
+          <div class="visa-head"><span data-t="visaHead">Tourist visa · Lake Baikal</span><span>Nº 31·X·2026</span></div>
+          <div class="visa-top">
+          <svg class="visa-stamp" id="visa-stamp" viewBox="0 0 100 100" aria-hidden="true">
+            <defs>
+              <path id="bkVisaRing" d="M50 50 m-38 0 a38 38 0 1 1 76 0 a38 38 0 1 1 -76 0"></path>
+              <filter id="bkWorn2" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="2" seed="5" result="wn"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="wn" scale="2.4" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter>
+            </defs>
+            <g filter="url(#bkWorn2)" fill="currentColor">
+              <circle cx="50" cy="50" r="47" fill="none" stroke="currentColor" stroke-width="3"></circle>
+              <circle cx="50" cy="50" r="30" fill="none" stroke="currentColor" stroke-width="1.2"></circle>
+              <text class="ring" font-size="8.6" font-weight="700" letter-spacing="1.2"><textPath href="#bkVisaRing" textLength="234" id="visa-ring">BAIKAL TOURIST BUREAU • 31 · X · 2026 •</textPath></text>
+              <text class="big" x="50" y="54" text-anchor="middle" font-size="12.5" font-weight="800" id="visa-word">APPROVED</text>
+            </g>
+          </svg>
+          <h3 class="visa-title" id="pass-title"></h3>
+          </div>
+          <dl>
+            <div><dt data-t="pGuest"></dt><dd id="p-name"></dd></div>
+            <div class="yes-row"><dt data-t="pParty"></dt><dd id="p-party"></dd></div>
+            <div class="wide yes-row"><dt data-t="pCountry"></dt><dd id="p-country"></dd></div>
+            <div class="wide yes-row"><dt data-t="pDish"></dt><dd id="p-dish"></dd></div>
+            <div class="wide" id="p-where-row" hidden><dt data-t="pWhere"></dt><dd id="p-where"></dd></div>
+          </dl>
+          <p class="visa-meta" id="pass-meta"></p>
+          <p class="visa-text" id="pass-text"></p>
+          <div class="mrz" aria-hidden="true"><span id="mrz1"></span><span id="mrz2"></span></div>
+          <div class="pass-actions">
+            <button type="button" class="btn btn-ghost btn-sm" id="change" data-t="change">Change my answer</button>
+          </div>
+        </div>
+      </div>
+
+      <form id="form" novalidate>
+        <div class="field" id="fld-name">
+          <label class="label" for="f-name" data-t="nameLabel">Traveller’s name</label>
+          <input type="text" id="f-name" name="name" autocomplete="given-name" maxlength="80" data-tp="namePh" aria-describedby="e-name">
+          <p class="err" id="e-name" hidden></p>
+        </div>
+
+        <fieldset class="field" id="fld-coming" aria-describedby="e-coming">
+          <legend data-t="comingLabel">Will you board the convoy?</legend>
+          <div class="seg">
+            <label><input type="radio" name="coming" value="yes"><span data-t="yes">Yes, I’m boarding</span></label>
+            <label><input type="radio" name="coming" value="no"><span data-t="no">Sadly, I can’t come</span></label>
+          </div>
+          <p class="err" id="e-coming" hidden></p>
+        </fieldset>
+
+        <div id="yes-fields" hidden>
+          <div class="field">
+            <span class="label" id="l-plus" data-t="plusLabel"></span>
+            <div class="stepper" role="group" aria-labelledby="l-plus">
+              <button type="button" id="plus-dec" data-ta="fewer" aria-label="Fewer">−</button>
+              <output id="f-plus" aria-live="polite">0</output>
+              <button type="button" id="plus-inc" data-ta="more" aria-label="More">+</button>
+            </div>
+            <p class="hint" id="h-plus"></p>
+          </div>
+
+          <div class="field combo" id="fld-country">
+            <label class="label" for="f-country" data-t="countryLabel"></label>
+            <div class="combo-box">
+              <span class="flag" id="country-flag" aria-hidden="true">🌍</span>
+              <input type="text" id="f-country" role="combobox" aria-autocomplete="list" aria-expanded="false"
+                     aria-controls="country-list" autocomplete="off" autocapitalize="words" spellcheck="false"
+                     maxlength="60" data-tp="countryPh" aria-describedby="h-country e-country">
+              <ul class="listbox" id="country-list" role="listbox" hidden></ul>
+            </div>
+            <p class="hint" id="h-country" data-t="countryHint"></p>
+            <p class="taken" id="country-taken" hidden></p>
+            <p class="err" id="e-country" hidden></p>
+          </div>
+
+          <div class="field">
+            <label class="label" for="f-dish"><span data-t="dishLabel"></span> <span class="opt">(<span data-t="optional"></span>)</span></label>
+            <input type="text" id="f-dish" maxlength="120" data-tp="dishPh" aria-describedby="h-dish">
+            <p class="hint" id="h-dish" data-t="dishHint"></p>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label" for="f-note"><span data-t="noteLabel"></span> <span class="opt">(<span data-t="optional"></span>)</span></label>
+          <textarea id="f-note" maxlength="500" rows="3" data-tp="notePh"></textarea>
+        </div>
+
+        <div class="hp" aria-hidden="true">
+          <label>Website <input type="text" name="website" id="f-website" tabindex="-1" autocomplete="off"></label>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary btn-block" id="submit" data-t="send">Submit my application</button>
+          <button type="button" class="btn btn-ghost btn-block" id="keep" data-t="keep" hidden>Keep my visa as it is</button>
+        </div>
+        <p class="status" id="status" role="status" aria-live="polite"></p>
+      </form>
+
+      <div class="fallback" id="fallback" hidden>
+        <h3 id="fb-title"></h3>
+        <p data-t="fbText"></p>
+        <pre id="fb-msg"></pre>
+        <div class="row">
+          <button type="button" class="btn btn-primary btn-sm" id="fb-copy" data-t="copy">Copy</button>
+          <button type="button" class="btn btn-ghost btn-sm" id="fb-share" data-t="share" hidden>Share</button>
+        </div>
+      </div>
+
+      <p class="closed" id="closed" hidden></p>
+    </div></div>
+  </section>
+
+  <footer id="footer">Questions? Text Vika.</footer>
+</div>
+
+<noscript><p style="text-align:center;padding:0 16px 40px;color:#CDB894">Please enable JavaScript to reply · Merci d’activer JavaScript · Включите JavaScript, чтобы ответить</p></noscript>
+
+<script>
+(function () {
+  'use strict';
+
+  var CFG = JSON.parse(document.getElementById('party-config').textContent);
+  var LANGS = ['en', 'fr', 'ru'];
+  var LOCALE = { en: 'en-US', fr: 'fr-FR', ru: 'ru-RU' };
+  var NB = ' ';
+  var K_LANG = 'hw26.lang', K_ID = 'hw26.guest', K_RSVP = 'hw26.rsvp';
+  var ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII'];
+
+  // ── Storage that never breaks the page (private mode, blocked cookies, in-app browsers) ──
+  var store = {
+    get: function (k) { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } },
+    set: function (k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  };
+
+  function plural(lang, n, forms) {
+    var rule = 'other';
+    try { rule = new Intl.PluralRules(LOCALE[lang]).select(n); } catch (e) {}
+    return forms[rule] || forms.other;
+  }
+  var RU_PEOPLE = { one: 'человек', few: 'человека', many: 'человек', other: 'человека' };
+  var RU_DAYS = { one: 'день', few: 'дня', many: 'дней', other: 'дня' };
+  function H(lang) { return CFG.host[lang] || CFG.host.en; }
+  function enTime(t) {
+    var h = +t.slice(0, 2), m = t.slice(3, 5);
+    return ((h % 12) || 12) + ':' + m + (h < 12 ? ' a.m.' : ' p.m.');
+  }
+  function frTime(t) { return t.slice(3, 5) === '00' ? (+t.slice(0, 2)) + 'h' : (+t.slice(0, 2)) + 'h' + t.slice(3, 5); }
+
+  // ── Copy. In-world voice: the Baikal Tourist Bureau. ──
+  var T = {
+    en: {
+      title: function () { return 'Visit Siberia! · ' + H('en') + '’s Birthday Expedition'; },
+      bureau: 'Baikal Tourist Bureau', line: 'Trans-Siberian Line · Season 1891–\u20602026',
+      visitWord: 'Visit', scrawl: 'never leave', visitRest: 'Siberia!',
+      plateAlt: 'Vintage view of frozen Lake Baikal at sunset, a steam train running along the far shore under a flaming sky',
+      stay: 'An Unforgettable Stay at Lake Baikal', eye: 'The Eye of Siberia',
+      expedition: function () { return H('en') + '’s Birthday Expedition'; },
+      game: 'An original role-playing game:', gameTitle: 'The Black Tears of Baikal',
+      departure: 'Departure',
+      depTime: function (t) { return t ? 'The convoy departs at ' + enTime(t) + ' sharp.' : 'The convoy departs in the evening.'; },
+      days: function (n) { return n + (n === 1 ? ' day' : ' days') + ' to departure'; },
+      tomorrow: 'Departure tomorrow!', tonight: 'Departure tonight!',
+      boarding: 'Boarding point', station: 'Listvyanka Station',
+      whereLater: function (c) { return c + '. The exact address comes once your visa is validated.'; },
+      dresscode: 'Dress code',
+      dress1a: 'Dress as one country', dress1b: 'of your choice.',
+      dress2a: 'Bring your favourite dish', dress2b: 'to share on the long journey.',
+      stampRing: 'TOURIST VISA • LAKE BAIKAL •', stampBy: function (d, m) { return 'BY ' + d + ' · ' + m; },
+      visaBy: function (dm) { return dm ? 'Please validate your tourist visa before ' + dm + '.' : 'Please validate your tourist visa.'; },
+      disclaimer: 'The agency declines all responsibility for travellers caught by the Spawn of the Forest.',
+      apply: 'Apply for a visa', calendar: 'Add to calendar', calGoogle: 'Google', calApple: 'Apple · Outlook',
+      formNo: 'Form V-31', formTitle: 'Visa application',
+      formIntro: 'One form per group of travellers. You can come back and change it.',
+      mapTitle: 'Countries already on board', mapEmpty: 'No flags on board yet. Yours could be the first.',
+      nameLabel: 'Traveller’s name', namePh: 'e.g. Anna',
+      comingLabel: 'Will you board the convoy?', yes: 'Yes, I’m boarding', no: 'Sadly, I can’t come',
+      plusLabel: 'Travellers coming with you',
+      plusHint: function (n) { return n === 0 ? 'Just you. Travelling light.' : 'Not counting you. ' + (n + 1) + ' travellers in total.'; },
+      fewer: 'Fewer travellers', more: 'More travellers',
+      countryLabel: 'Country you represent',
+      countryPh: 'Start typing: Italy, Japan, Brazil…',
+      countryHint: 'A culture works too: type it in your own words. Your companions can join your country.',
+      useCustom: function (t) { return 'Use “' + t + '”'; },
+      onMap: 'on board',
+      taken: function (c) { return c + ' is already on board. Join them or pick another country, both work.'; },
+      dishLabel: 'Dish for the journey', dishPh: 'e.g. grandma’s pierogi', dishHint: 'You can decide later and update your visa.',
+      noteLabel: 'A note for the agency', notePh: function () { return 'Allergies, questions, or just hello to ' + H('en'); },
+      optional: 'optional',
+      send: 'Submit my application', update: 'Update my visa', keep: 'Keep my visa as it is', sending: 'Stamping…',
+      errName: 'Please write the traveller’s name.', errComing: 'Choose yes or no.', errCountry: 'Pick a country or type a culture.',
+      errSend: 'The agency couldn’t receive your application. Check your connection and try again.',
+      fbTitle: function () { return 'Send it to ' + H('en') + ' directly'; },
+      fbText: function () { return 'The online desk isn’t answering right now. Copy your answer and send it to ' + H('en') + ' in a message.'; },
+      copy: 'Copy', copied: 'Copied', share: 'Share',
+      fbHello: function () { return 'Hi ' + H('en') + '! My visa application for the Baikal expedition:'; },
+      fbYes: 'Boarding: yes', fbNo: 'Boarding: sadly no',
+      visaHead: 'Tourist visa · Lake Baikal', visaRing: 'BAIKAL TOURIST BUREAU • 31 · X · 2026 •', visaWord: 'APPROVED',
+      passYes: function (name) { return 'Visa approved, ' + name + '!'; },
+      passNo: function (name) { return 'We’ll miss you, ' + name; },
+      passYesText: 'Your visa is registered with the agency.',
+      addressLater: function () { return H('en') + ' will send you the exact address personally.'; },
+      passNoText: 'Thank you for letting the agency know. If your plans change, you can update your visa here.',
+      unsent: function () { return 'Send this answer to ' + H('en') + ' in a message so she can add you to the passenger list.'; },
+      pGuest: 'Traveller', pParty: 'Party of', pCountry: 'Representing', pDish: 'Dish for the journey', pWhere: 'Boarding point',
+      dishTbd: 'to be decided',
+      people: function (n) { return n + (n === 1 ? ' traveller' : ' travellers'); },
+      change: 'Change my answer',
+      lost: 'The agency can’t find your visa on the list anymore. Please submit it again.',
+      closed: 'The convoy has left. Thank you for an unforgettable expedition!',
+      footer: function () { return 'Questions? Text ' + H('en') + '.'; }
+    },
+    fr: {
+      title: function () { return 'Visitez la Sibérie' + NB + '! · l’expédition d’anniversaire de ' + H('fr'); },
+      bureau: 'Bureau du tourisme du Baïkal', line: 'Ligne Transsibérienne · Saison 1891–\u20602026',
+      visitWord: 'Visitez', scrawl: 'ne quittez jamais', visitRest: 'la Sibérie' + NB + '!',
+      plateAlt: 'Vue rétro du lac Baïkal gelé au coucher du soleil, un train à vapeur longe la rive sous un ciel en feu',
+      stay: 'Un séjour inoubliable au lac Baïkal', eye: 'L’Œil de la Sibérie',
+      expedition: function () { return 'L’expédition d’anniversaire de ' + H('fr'); },
+      game: 'Un jeu de rôle original' + NB + ':', gameTitle: 'Les Larmes noires du Baïkal',
+      departure: 'Départ',
+      depTime: function (t) { return t ? 'Le convoi part à ' + frTime(t) + ' précises.' : 'Le convoi part en soirée.'; },
+      days: function (n) { return 'Départ dans ' + n + (n === 1 ? ' jour' : ' jours'); },
+      tomorrow: 'Départ demain' + NB + '!', tonight: 'Départ ce soir' + NB + '!',
+      boarding: 'Point d’embarquement', station: 'Gare de Listvianka',
+      whereLater: function (c) { return c + '. L’adresse exacte vous parviendra une fois votre visa validé.'; },
+      dresscode: 'Tenue exigée',
+      dress1a: 'Habillez-vous en un pays', dress1b: 'de votre choix.',
+      dress2a: 'Apportez votre plat préféré', dress2b: 'à partager pendant le long voyage.',
+      stampRing: 'VISA TOURISTIQUE • LAC BAÏKAL •', stampBy: function (d, m) { return 'AVANT ' + d + ' · ' + m; },
+      visaBy: function (dm) { return dm ? 'Veuillez faire valider votre visa touristique avant le ' + dm + '.' : 'Veuillez faire valider votre visa touristique.'; },
+      disclaimer: 'L’agence décline toute responsabilité envers les voyageurs capturés par l’Engeance de la Forêt.',
+      apply: 'Demander un visa', calendar: 'Ajouter à l’agenda', calGoogle: 'Google', calApple: 'Apple · Outlook',
+      formNo: 'Formulaire V-31', formTitle: 'Demande de visa',
+      formIntro: 'Un formulaire par groupe de voyageurs. Vous pourrez revenir le modifier.',
+      mapTitle: 'Pays déjà à bord', mapEmpty: 'Aucun drapeau à bord pour l’instant. Le vôtre peut être le premier.',
+      nameLabel: 'Nom du voyageur', namePh: 'p. ex. Anna',
+      comingLabel: 'Monterez-vous dans le convoi' + NB + '?', yes: 'Oui, j’embarque', no: 'Hélas, je ne pourrai pas',
+      plusLabel: 'Voyageurs qui vous accompagnent',
+      plusHint: function (n) { return n === 0 ? 'Vous seul·e. Voyage léger.' : 'Sans vous compter. ' + (n + 1) + ' voyageurs au total.'; },
+      fewer: 'Moins de voyageurs', more: 'Plus de voyageurs',
+      countryLabel: 'Pays que vous représentez',
+      countryPh: 'Commencez à taper' + NB + ': Italie, Japon, Brésil…',
+      countryHint: 'Une culture fonctionne aussi' + NB + ': écrivez-la avec vos mots. Vos compagnons peuvent rejoindre votre pays.',
+      useCustom: function (t) { return 'Choisir «' + NB + t + NB + '»'; },
+      onMap: 'à bord',
+      taken: function (c) { return '«' + NB + c + NB + '» est déjà à bord. Rejoignez-les ou choisissez un autre pays, les deux marchent.'; },
+      dishLabel: 'Plat pour le voyage', dishPh: 'p. ex. les pierogi de mamie', dishHint: 'Vous pourrez décider plus tard et mettre à jour votre visa.',
+      noteLabel: 'Un mot pour l’agence', notePh: function () { return 'Allergies, questions, ou juste un coucou à ' + H('fr'); },
+      optional: 'facultatif',
+      send: 'Envoyer ma demande', update: 'Mettre à jour mon visa', keep: 'Garder mon visa tel quel', sending: 'Tamponnage…',
+      errName: 'Veuillez indiquer le nom du voyageur.', errComing: 'Choisissez oui ou non.', errCountry: 'Choisissez un pays ou écrivez une culture.',
+      errSend: 'L’agence n’a pas reçu votre demande. Vérifiez votre connexion et réessayez.',
+      fbTitle: function () { return 'Envoyez-la directement à ' + H('fr'); },
+      fbText: function () { return 'Le guichet en ligne ne répond pas pour l’instant. Copiez votre réponse et envoyez-la à ' + H('fr') + ' par message.'; },
+      copy: 'Copier', copied: 'Copié', share: 'Partager',
+      fbHello: function () { return 'Coucou ' + H('fr') + NB + '! Ma demande de visa pour l’expédition au Baïkal' + NB + ':'; },
+      fbYes: 'J’embarque' + NB + ': oui', fbNo: 'J’embarque' + NB + ': hélas non',
+      visaHead: 'Visa touristique · Lac Baïkal', visaRing: 'BUREAU DU TOURISME DU BAÏKAL • 31 · X ·', visaWord: 'VALIDÉ',
+      passYes: function (name) { return 'Visa validé, ' + name + NB + '!'; },
+      passNo: function (name) { return 'Vous allez nous manquer, ' + name; },
+      passYesText: 'Votre visa est enregistré auprès de l’agence.',
+      addressLater: function () { return H('fr') + ' vous enverra l’adresse exacte personnellement.'; },
+      passNoText: 'Merci d’avoir prévenu l’agence. Si vos plans changent, vous pouvez mettre à jour votre visa ici.',
+      unsent: function () { return 'Envoyez cette réponse à ' + H('fr') + ' par message pour qu’elle vous ajoute à la liste des passagers.'; },
+      pGuest: 'Voyageur', pParty: 'Nombre de voyageurs', pCountry: 'Pays', pDish: 'Plat pour le voyage', pWhere: 'Point d’embarquement',
+      dishTbd: 'à décider',
+      people: function (n) { return n + (n === 1 ? ' voyageur' : ' voyageurs'); },
+      change: 'Modifier ma réponse',
+      lost: 'L’agence ne retrouve plus votre visa sur la liste. Merci de le renvoyer.',
+      closed: 'Le convoi est parti. Merci pour cette expédition inoubliable' + NB + '!',
+      footer: function () { return 'Une question' + NB + '? Écrivez à ' + H('fr') + '.'; }
+    },
+    ru: {
+      title: function () { return 'Посетите Сибирь! · экспедиция на день рождения ' + CFG.host.ruGen; },
+      bureau: 'Байкальское бюро туризма', line: 'Транссибирская линия · Сезон 1891–\u20602026',
+      visitWord: 'Посетите', scrawl: 'не покидайте', visitRest: 'Сибирь!',
+      plateAlt: 'Старинный вид на замёрзший Байкал на закате: паровоз идёт вдоль дальнего берега под огненным небом',
+      stay: 'Незабываемый отдых на Байкале', eye: 'Око Сибири',
+      expedition: function () { return 'Экспедиция на день рождения ' + CFG.host.ruGen; },
+      game: 'Авторская ролевая игра:', gameTitle: 'Чёрные слёзы Байкала',
+      departure: 'Отправление',
+      depTime: function (t) { return t ? 'Конвой отправляется ровно в ' + t + '.' : 'Конвой отправляется вечером.'; },
+      days: function (n) { return 'До отправления ' + n + ' ' + plural('ru', n, RU_DAYS); },
+      tomorrow: 'Отправление завтра!', tonight: 'Отправление сегодня!',
+      boarding: 'Место посадки', station: 'Станция Листвянка',
+      whereLater: function (c) { return c + '. Точный адрес пришлём после оформления визы.'; },
+      dresscode: 'Дресс-код',
+      dress1a: 'Наряд одной страны', dress1b: 'на ваш выбор.',
+      dress2a: 'Возьмите любимое блюдо,', dress2b: 'чтобы разделить его в долгой дороге.',
+      stampRing: 'ТУРИСТИЧЕСКАЯ ВИЗА • БАЙКАЛ •', stampBy: function (d, m) { return 'ДО ' + d + ' · ' + m; },
+      visaBy: function (dm) { return dm ? 'Просим оформить туристическую визу до ' + dm + '.' : 'Просим оформить туристическую визу.'; },
+      disclaimer: 'Агентство не несёт ответственности за путешественников, пойманных Лесным Отродьем.',
+      apply: 'Оформить визу', calendar: 'Добавить в календарь', calGoogle: 'Google', calApple: 'Apple · Outlook',
+      formNo: 'Форма В-31', formTitle: 'Анкета на визу',
+      formIntro: 'Одна анкета на компанию путешественников. Её можно будет изменить.',
+      mapTitle: 'Страны уже на борту', mapEmpty: 'На борту пока ни одного флага. Ваш может стать первым.',
+      nameLabel: 'Имя путешественника', namePh: 'например, Аня',
+      comingLabel: 'Поедете с конвоем?', yes: 'Да, еду', no: 'Увы, не смогу',
+      plusLabel: 'Сколько человек едет с вами',
+      plusHint: function (n) { return n === 0 ? 'Только вы. Налегке.' : 'Не считая вас. Всего ' + (n + 1) + ' ' + plural('ru', n + 1, RU_PEOPLE) + '.'; },
+      fewer: 'Меньше спутников', more: 'Больше спутников',
+      countryLabel: 'Страна, которую вы представляете',
+      countryPh: 'Начните вводить: Италия, Япония, Бразилия…',
+      countryHint: 'Можно и культуру: напишите своими словами. Спутники могут выступать за вашу страну.',
+      useCustom: function (t) { return 'Выбрать «' + t + '»'; },
+      onMap: 'на борту',
+      taken: function (c) { return '«' + c + '» уже на борту. Можно присоединиться или выбрать другую страну.'; },
+      dishLabel: 'Блюдо в дорогу', dishPh: 'например, бабушкины пирожки', dishHint: 'Можно решить позже и обновить визу.',
+      noteLabel: 'Пара слов агентству', notePh: function () { return 'Аллергии, вопросы или просто привет ' + CFG.host.ruDat; },
+      optional: 'необязательно',
+      send: 'Отправить анкету', update: 'Обновить визу', keep: 'Оставить визу как есть', sending: 'Ставим печать…',
+      errName: 'Укажите, пожалуйста, имя путешественника.', errComing: 'Выберите: да или нет.', errCountry: 'Выберите страну или напишите культуру.',
+      errSend: 'Анкета не дошла до агентства. Проверьте интернет и попробуйте ещё раз.',
+      fbTitle: function () { return 'Отправьте анкету ' + CFG.host.ruDat + ' напрямую'; },
+      fbText: function () { return 'Онлайн-окошко сейчас не отвечает. Скопируйте ответ и пришлите ' + CFG.host.ruDat + ' сообщением.'; },
+      copy: 'Скопировать', copied: 'Скопировано', share: 'Поделиться',
+      fbHello: function () { return 'Привет, ' + CFG.host.ru + '! Моя анкета на визу в байкальскую экспедицию:'; },
+      fbYes: 'Еду: да', fbNo: 'Еду: увы, нет',
+      visaHead: 'Туристическая виза · Байкал', visaRing: 'БАЙКАЛЬСКОЕ БЮРО ТУРИЗМА • 31 · X ·', visaWord: 'ОДОБРЕНО',
+      passYes: function (name) { return 'Виза одобрена, ' + name + '!'; },
+      passNo: function (name) { return 'Будем скучать, ' + name; },
+      passYesText: 'Ваша виза зарегистрирована в агентстве.',
+      addressLater: function () { return 'Точный адрес ' + CFG.host.ru + ' пришлёт лично.'; },
+      passNoText: 'Спасибо, что предупредили агентство. Если планы изменятся, визу можно обновить здесь.',
+      unsent: function () { return 'Пришлите этот ответ ' + CFG.host.ruDat + ' сообщением, чтобы она внесла вас в список пассажиров.'; },
+      pGuest: 'Путешественник', pParty: 'Сколько вас', pCountry: 'Страна', pDish: 'Блюдо в дорогу', pWhere: 'Место посадки',
+      dishTbd: 'пока не решено',
+      people: function (n) { return n + ' ' + plural('ru', n, RU_PEOPLE); },
+      change: 'Изменить ответ',
+      lost: 'Агентство не нашло вашу визу в списке. Отправьте анкету ещё раз, пожалуйста.',
+      closed: 'Конвой ушёл. Спасибо за незабываемую экспедицию!',
+      footer: function () { return 'Вопросы? Пишите ' + CFG.host.ruDat + '.'; }
+    }
+  };
+
+  // ── Countries: ISO codes + English fallback names; local names come from the browser ──
+  var RAW = 'AD:Andorra|AE:United Arab Emirates|AF:Afghanistan|AG:Antigua & Barbuda|AI:Anguilla|AL:Albania|AM:Armenia|AO:Angola|AQ:Antarctica|AR:Argentina|AS:American Samoa|AT:Austria|AU:Australia|AW:Aruba|AX:Åland Islands|AZ:Azerbaijan|BA:Bosnia & Herzegovina|BB:Barbados|BD:Bangladesh|BE:Belgium|BF:Burkina Faso|BG:Bulgaria|BH:Bahrain|BI:Burundi|BJ:Benin|BL:St. Barthélemy|BM:Bermuda|BN:Brunei|BO:Bolivia|BQ:Caribbean Netherlands|BR:Brazil|BS:Bahamas|BT:Bhutan|BW:Botswana|BY:Belarus|BZ:Belize|CA:Canada|CC:Cocos (Keeling) Islands|CD:Congo - Kinshasa|CF:Central African Republic|CG:Congo - Brazzaville|CH:Switzerland|CI:Côte d’Ivoire|CK:Cook Islands|CL:Chile|CM:Cameroon|CN:China|CO:Colombia|CR:Costa Rica|CU:Cuba|CV:Cape Verde|CW:Curaçao|CX:Christmas Island|CY:Cyprus|CZ:Czechia|DE:Germany|DJ:Djibouti|DK:Denmark|DM:Dominica|DO:Dominican Republic|DZ:Algeria|EC:Ecuador|EE:Estonia|EG:Egypt|EH:Western Sahara|ER:Eritrea|ES:Spain|ET:Ethiopia|FI:Finland|FJ:Fiji|FK:Falkland Islands|FM:Micronesia|FO:Faroe Islands|FR:France|GA:Gabon|GB:United Kingdom|GD:Grenada|GE:Georgia|GF:French Guiana|GG:Guernsey|GH:Ghana|GI:Gibraltar|GL:Greenland|GM:Gambia|GN:Guinea|GP:Guadeloupe|GQ:Equatorial Guinea|GR:Greece|GS:South Georgia & South Sandwich Islands|GT:Guatemala|GU:Guam|GW:Guinea-Bissau|GY:Guyana|HK:Hong Kong|HN:Honduras|HR:Croatia|HT:Haiti|HU:Hungary|ID:Indonesia|IE:Ireland|IL:Israel|IM:Isle of Man|IN:India|IO:British Indian Ocean Territory|IQ:Iraq|IR:Iran|IS:Iceland|IT:Italy|JE:Jersey|JM:Jamaica|JO:Jordan|JP:Japan|KE:Kenya|KG:Kyrgyzstan|KH:Cambodia|KI:Kiribati|KM:Comoros|KN:St. Kitts & Nevis|KP:North Korea|KR:South Korea|KW:Kuwait|KY:Cayman Islands|KZ:Kazakhstan|LA:Laos|LB:Lebanon|LC:St. Lucia|LI:Liechtenstein|LK:Sri Lanka|LR:Liberia|LS:Lesotho|LT:Lithuania|LU:Luxembourg|LV:Latvia|LY:Libya|MA:Morocco|MC:Monaco|MD:Moldova|ME:Montenegro|MF:St. Martin|MG:Madagascar|MH:Marshall Islands|MK:North Macedonia|ML:Mali|MM:Myanmar (Burma)|MN:Mongolia|MO:Macao|MP:Northern Mariana Islands|MQ:Martinique|MR:Mauritania|MS:Montserrat|MT:Malta|MU:Mauritius|MV:Maldives|MW:Malawi|MX:Mexico|MY:Malaysia|MZ:Mozambique|NA:Namibia|NC:New Caledonia|NE:Niger|NF:Norfolk Island|NG:Nigeria|NI:Nicaragua|NL:Netherlands|NO:Norway|NP:Nepal|NR:Nauru|NU:Niue|NZ:New Zealand|OM:Oman|PA:Panama|PE:Peru|PF:French Polynesia|PG:Papua New Guinea|PH:Philippines|PK:Pakistan|PL:Poland|PM:St. Pierre & Miquelon|PN:Pitcairn Islands|PR:Puerto Rico|PS:Palestinian Territories|PT:Portugal|PW:Palau|PY:Paraguay|QA:Qatar|RE:Réunion|RO:Romania|RS:Serbia|RU:Russia|RW:Rwanda|SA:Saudi Arabia|SB:Solomon Islands|SC:Seychelles|SD:Sudan|SE:Sweden|SG:Singapore|SH:St. Helena|SI:Slovenia|SJ:Svalbard & Jan Mayen|SK:Slovakia|SL:Sierra Leone|SM:San Marino|SN:Senegal|SO:Somalia|SR:Suriname|SS:South Sudan|ST:São Tomé & Príncipe|SV:El Salvador|SX:Sint Maarten|SY:Syria|SZ:Eswatini|TC:Turks & Caicos Islands|TD:Chad|TF:French Southern Territories|TG:Togo|TH:Thailand|TJ:Tajikistan|TK:Tokelau|TL:Timor-Leste|TM:Turkmenistan|TN:Tunisia|TO:Tonga|TR:Türkiye|TT:Trinidad & Tobago|TV:Tuvalu|TW:Taiwan|TZ:Tanzania|UA:Ukraine|UG:Uganda|US:United States|UY:Uruguay|UZ:Uzbekistan|VA:Vatican City|VC:St. Vincent & Grenadines|VE:Venezuela|VG:British Virgin Islands|VI:U.S. Virgin Islands|VN:Vietnam|VU:Vanuatu|WF:Wallis & Futuna|WS:Samoa|XK:Kosovo|YE:Yemen|YT:Mayotte|ZA:South Africa|ZM:Zambia|ZW:Zimbabwe';
+  var EXTRA = [
+    { code: 'GB-ENG', tag: 'gbeng', en: 'England', fr: 'Angleterre', ru: 'Англия' },
+    { code: 'GB-SCT', tag: 'gbsct', en: 'Scotland', fr: 'Écosse', ru: 'Шотландия' },
+    { code: 'GB-WLS', tag: 'gbwls', en: 'Wales', fr: 'Pays de Galles', ru: 'Уэльс' }
+  ];
+  var OVERRIDE = {
+    en: { HK: 'Hong Kong', MO: 'Macao' },
+    fr: { HK: 'Hong Kong', MO: 'Macao' },
+    ru: { US: 'США', KR: 'Южная Корея', HK: 'Гонконг', MO: 'Макао' }
+  };
+  var ALIASES = {
+    US: 'usa america amerique etats unis сша америка штаты', GB: 'uk britain great britain grande bretagne англия британия',
+    AE: 'uae emirates emirats оаэ эмираты', NL: 'holland hollande голландия', KR: 'korea coree корея',
+    CZ: 'czech republic tcheque чехия', CI: 'ivory coast cote divoire', MM: 'burma birmanie бирма',
+    MK: 'macedonia macedoine македония', TR: 'turkey turquie турция', BY: 'belarus belorussia белоруссия беларусь',
+    VA: 'vatican ватикан', CV: 'cabo verde', SZ: 'swaziland свазиленд'
+  };
+  var COUNTRIES = RAW.split('|').map(function (p) {
+    var i = p.indexOf(':');
+    return { code: p.slice(0, i), en: p.slice(i + 1) };
+  }).concat(EXTRA);
+  var BY_CODE = {};
+  COUNTRIES.forEach(function (c) { BY_CODE[c.code] = c; });
+
+  var dnCache = {};
+  function displayNames(l) {
+    if (!(l in dnCache)) {
+      try { dnCache[l] = new Intl.DisplayNames([LOCALE[l]], { type: 'region' }); } catch (e) { dnCache[l] = null; }
+    }
+    return dnCache[l];
+  }
+  function countryName(c, l) {
+    var o = OVERRIDE[l] && OVERRIDE[l][c.code];
+    if (o) return o;
+    if (c.tag) return c[l] || c.en;
+    var dn = displayNames(l);
+    if (dn) { try { var n = dn.of(c.code); if (n && n !== c.code) return n; } catch (e) {} }
+    return c.en;
+  }
+  function flag(c) {
+    if (!c) return '🌍';
+    try {
+      if (c.tag) {
+        return String.fromCodePoint.apply(null, [0x1F3F4].concat(c.tag.split('').map(function (ch) {
+          return 0xE0000 + ch.charCodeAt(0);
+        }), [0xE007F]));
+      }
+      return String.fromCodePoint.apply(null, c.code.split('').map(function (ch) { return 0x1F1E6 + ch.charCodeAt(0) - 65; }));
+    } catch (e) { return '🌍'; }
+  }
+  function norm(s) {
+    return String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+      .replace(/[^a-z0-9а-яё]+/g, ' ').trim();
+  }
+  var searchIndex = null;
+  function buildIndex() {
+    if (searchIndex) return;
+    searchIndex = {};
+    COUNTRIES.forEach(function (c) {
+      var names = LANGS.map(function (l) { return countryName(c, l); }).concat([c.en, ALIASES[c.code] || '']);
+      searchIndex[c.code] = { names: names.map(norm), words: norm(names.join(' ')).split(' ') };
+    });
+  }
+  function exactCountry(text) {
+    var q = norm(text);
+    if (!q) return null;
+    buildIndex();
+    for (var i = 0; i < COUNTRIES.length; i++) {
+      if (searchIndex[COUNTRIES[i].code].names.indexOf(q) >= 0) return COUNTRIES[i];
+    }
+    return null;
+  }
+  function searchCountries(text) {
+    buildIndex();
+    var q = norm(text);
+    var list = COUNTRIES.map(function (c) { return { c: c, name: countryName(c, lang) }; });
+    if (q) {
+      list = list.filter(function (it) {
+        var idx = searchIndex[it.c.code];
+        if (norm(it.name).indexOf(q) === 0) { it.rank = 0; return true; }
+        if (idx.words.some(function (w) { return w.indexOf(q) === 0; })) { it.rank = 1; return true; }
+        if (idx.names.some(function (n) { return n.indexOf(q) >= 0; })) { it.rank = 2; return true; }
+        return false;
+      });
+    } else {
+      list.forEach(function (it) { it.rank = 0; });
+    }
+    list.sort(function (a, b) { return a.rank - b.rank || a.name.localeCompare(b.name, LOCALE[lang]); });
+    return list;
+  }
+
+  // ── State ──
+  var $ = function (id) { return document.getElementById(id); };
+  var lang = pickLang();
+  var summary = null;
+  var saved = store.get(K_RSVP);
+  var editing = false;
+  var busy = false;
+  var plus = 0;
+  var country = null;        // { code } or { custom: 'text' }
+  var notice = '';
+  var today = todayParts();
+
+  function pickLang() {
+    var q = null;
+    try { q = new URLSearchParams(location.search).get('lang'); } catch (e) {}
+    if (q && LANGS.indexOf(q) >= 0) return q;
+    var s = store.get(K_LANG);
+    if (s && LANGS.indexOf(s) >= 0) return s;
+    var prefs = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || 'en'];
+    for (var i = 0; i < prefs.length; i++) {
+      var l = String(prefs[i]).slice(0, 2).toLowerCase();
+      if (LANGS.indexOf(l) >= 0) return l;
+    }
+    return 'en';
+  }
+  function t(key) {
+    var v = T[lang][key];
+    if (v === undefined) v = T.en[key];
+    return typeof v === 'function' ? v.apply(null, Array.prototype.slice.call(arguments, 1)) : v;
+  }
+  function guestId() {
+    var id = store.get(K_ID);
+    if (!id) {
+      id = (window.crypto && crypto.randomUUID) ? crypto.randomUUID()
+        : 'g-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
+      store.set(K_ID, id);
+    }
+    return id;
+  }
+
+  // ── Dates ──
+  function todayParts() {
+    var forced = null;
+    try { forced = new URLSearchParams(location.search).get('today'); } catch (e) {}
+    if (forced && /^\d{4}-\d{2}-\d{2}$/.test(forced)) return forced;
+    try {
+      var parts = new Intl.DateTimeFormat('en-GB', { timeZone: CFG.timeZone, year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date());
+      var get = function (type) { return parts.filter(function (p) { return p.type === type; })[0].value; };
+      return get('year') + '-' + get('month') + '-' + get('day');
+    } catch (e) {
+      var d = new Date();
+      return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+  }
+  function utc(iso) { return Date.UTC(+iso.slice(0, 4), +iso.slice(5, 7) - 1, +iso.slice(8, 10)); }
+  function daysLeft() { return Math.round((utc(CFG.date) - utc(today)) / 86400000); }
+  function fmt(iso, opts) {
+    return new Intl.DateTimeFormat(LOCALE[lang], Object.assign({ timeZone: 'UTC' }, opts)).format(new Date(utc(iso)));
+  }
+  function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+  function dayMonth(iso) { return fmt(iso, { day: 'numeric', month: 'long' }); }
+  function weekday(iso) { return cap(fmt(iso, { weekday: 'long' })); }
+  function addDay(iso) { return new Date(utc(iso) + 86400000).toISOString().slice(0, 10); }
+  function localTime(t) { return lang === 'en' ? enTime(t) : lang === 'fr' ? frTime(t) : t; }
+
+  function googleCalendarUrl() {
+    var d = CFG.date.replace(/-/g, '');
+    var dates;
+    if (CFG.startTime) {
+      var start = CFG.startTime.replace(':', '') + '00';
+      var endTime = CFG.endTime || '';
+      var endDay = d, end;
+      if (endTime) {
+        end = endTime.replace(':', '') + '00';
+        if (endTime <= CFG.startTime) endDay = addDay(CFG.date).replace(/-/g, '');
+      } else {
+        var h = (+CFG.startTime.slice(0, 2) + 5);
+        if (h >= 24) { h -= 24; endDay = addDay(CFG.date).replace(/-/g, ''); }
+        end = String(h).padStart(2, '0') + CFG.startTime.slice(3, 5) + '00';
+      }
+      dates = d + 'T' + start + '/' + endDay + 'T' + end;
+    } else {
+      dates = d + '/' + addDay(CFG.date).replace(/-/g, '');
+    }
+    var details = t('game') + ' ' + t('gameTitle') + '\n' + t('dress1a') + ' ' + t('dress1b') + ' ' +
+      t('dress2a') + ' ' + t('dress2b') + '\n' + t('depTime', CFG.startTime) + '\n' + CFG.pageUrl;
+    return 'https://calendar.google.com/calendar/render?action=TEMPLATE' +
+      '&text=' + encodeURIComponent(t('eye') + ' · ' + t('expedition')) +
+      '&dates=' + dates + (CFG.startTime ? '&ctz=' + encodeURIComponent(CFG.timeZone) : '') +
+      '&details=' + encodeURIComponent(details) +
+      '&location=' + encodeURIComponent(CFG.address || CFG.city[lang] || CFG.city.en);
+  }
+
+  // ── Rendering ──
+  function applyLang() {
+    document.documentElement.lang = lang;
+    document.title = t('title');
+    Array.prototype.forEach.call(document.querySelectorAll('[data-t]'), function (el) { el.textContent = t(el.getAttribute('data-t')); });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-tp]'), function (el) { el.setAttribute('placeholder', t(el.getAttribute('data-tp'))); });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-ta]'), function (el) { el.setAttribute('aria-label', t(el.getAttribute('data-ta'))); });
+    Array.prototype.forEach.call(document.querySelectorAll('.langs button'), function (b) {
+      b.setAttribute('aria-pressed', String(b.getAttribute('data-lang') === lang));
+    });
+    $('visit-word').textContent = t('visitWord');
+    $('scrawl').textContent = t('scrawl');
+    $('visit-rest').textContent = t('visitRest');
+    $('visit').setAttribute('aria-label', t('visitWord') + ' ' + t('visitRest') + ' (' + t('scrawl') + ')');
+    $('plate-svg').setAttribute('aria-label', t('plateAlt'));
+    $('expedition').textContent = t('expedition');
+    $('dep-date').textContent = dayMonth(CFG.date);
+    $('dep-time').textContent = t('depTime', CFG.startTime);
+    $('where').textContent = CFG.address || t('whereLater', CFG.city[lang] || CFG.city.en);
+    $('stamp-ring').textContent = t('stampRing');
+    if (CFG.rsvpBy) {
+      $('stamp-by').textContent = t('stampBy', +CFG.rsvpBy.slice(8, 10), ROMAN[+CFG.rsvpBy.slice(5, 7) - 1]);
+      $('visa-by').textContent = t('visaBy', dayMonth(CFG.rsvpBy));
+    } else {
+      $('stamp-by').textContent = '';
+      $('visa-by').textContent = t('visaBy', '');
+    }
+    $('visa-ring').textContent = t('visaRing');
+    $('visa-word').textContent = t('visaWord');
+    $('fb-title').textContent = t('fbTitle');
+    $('footer').textContent = t('footer');
+    $('cal-google').href = googleCalendarUrl();
+    $('cal-ics').href = 'party-' + lang + '.ics';
+    renderCountdown();
+    renderPlus();
+    renderCountryInput();
+    renderChips();
+    renderRsvp();
+  }
+
+  function renderCountdown() {
+    var n = daysLeft(), el = $('countdown');
+    if (n < 0) { el.hidden = true; return; }
+    el.textContent = weekday(CFG.date) + ' · ' + (n === 0 ? t('tonight') : n === 1 ? t('tomorrow') : t('days', n));
+    el.hidden = false;
+  }
+
+  function renderPlus() {
+    $('f-plus').textContent = String(plus);
+    $('plus-dec').disabled = plus <= 0;
+    $('plus-inc').disabled = plus >= CFG.maxPlusOnes;
+    $('h-plus').textContent = t('plusHint', plus);
+  }
+
+  function takenInfo(code, name) {
+    if (!summary || !summary.countries || !CFG.showTakenCountries) return null;
+    var key = code || norm(name);
+    for (var i = 0; i < summary.countries.length; i++) {
+      var s = summary.countries[i];
+      if ((s.code && s.code === key) || (!s.code && norm(s.name) === key)) return s;
+    }
+    return null;
+  }
+  function sameCountry(s, c) {
+    return c.code ? s.code === c.code : !s.code && norm(s.custom) === norm(c.custom);
+  }
+  function labelFor(sel) {
+    if (!sel) return '';
+    if (sel.code && BY_CODE[sel.code]) return countryName(BY_CODE[sel.code], lang);
+    return sel.custom || '';
+  }
+  function renderCountryInput() {
+    var input = $('f-country');
+    if (country && document.activeElement !== input) input.value = labelFor(country);
+    $('country-flag').textContent = country && country.code ? flag(BY_CODE[country.code]) : '🌍';
+    var taken = country && takenInfo(country.code, country.custom);
+    var own = taken && saved && saved.sent && saved.coming === 'yes' && sameCountry(saved, country);
+    if (taken && taken.teams - (own ? 1 : 0) > 0) {
+      $('country-taken').textContent = t('taken', labelFor(country));
+      $('country-taken').hidden = false;
+    } else {
+      $('country-taken').hidden = true;
+    }
+  }
+
+  function renderChips() {
+    var section = $('map');
+    if (!CFG.endpoint || !CFG.showTakenCountries || !summary) { section.hidden = true; return; }
+    var ul = $('chips');
+    ul.textContent = '';
+    (summary.countries || []).forEach(function (s) {
+      var c = s.code && BY_CODE[s.code];
+      var li = document.createElement('li');
+      var f = document.createElement('span');
+      f.setAttribute('aria-hidden', 'true');
+      f.textContent = c ? flag(c) : '🌍';
+      var name = document.createElement('span');
+      name.textContent = c ? countryName(c, lang) : s.name;
+      li.appendChild(f); li.appendChild(name);
+      if (s.teams > 1) {
+        var n = document.createElement('span');
+        n.className = 'n';
+        n.textContent = '×' + s.teams;
+        li.appendChild(n);
+      }
+      ul.appendChild(li);
+    });
+    $('chips-empty').hidden = (summary.countries || []).length > 0;
+    section.hidden = false;
+  }
+
+  function isClosed() { return daysLeft() < 0; }
+
+  function renderRsvp() {
+    var closed = isClosed();
+    var showPass = !!saved && !editing;
+    $('pass').hidden = !showPass;
+    $('form').hidden = closed || showPass;
+    $('closed').hidden = !closed;
+    $('closed').textContent = t('closed');
+    $('change').hidden = closed;
+    $('notice').hidden = !notice;
+    $('notice').textContent = notice ? t(notice) : '';
+    $('submit').textContent = busy ? t('sending') : (saved ? t('update') : t('send'));
+    $('keep').hidden = !(saved && editing);
+    $('yes-fields').hidden = currentComing() !== 'yes';
+    if (showPass) renderPass();
+    var unsent = saved && !saved.sent && !editing;
+    if (unsent && !CFG.endpoint) showFallback(saved);
+    else if (!$('fallback').dataset.forced) $('fallback').hidden = true;
+  }
+
+  var TRANSLIT = { а: 'A', б: 'B', в: 'V', г: 'G', д: 'D', е: 'E', ё: 'E', ж: 'ZH', з: 'Z', и: 'I', й: 'I', к: 'K', л: 'L', м: 'M', н: 'N', о: 'O', п: 'P', р: 'R', с: 'S', т: 'T', у: 'U', ф: 'F', х: 'KH', ц: 'TS', ч: 'CH', ш: 'SH', щ: 'SHCH', ъ: '', ы: 'Y', ь: '', э: 'E', ю: 'IU', я: 'IA' };
+  function mrz(s) {
+    return String(s || '').toLowerCase().split('').map(function (ch) { return ch in TRANSLIT ? TRANSLIT[ch] : ch; }).join('')
+      .normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase().replace(/[^A-Z0-9]+/g, '<');
+  }
+  function padMrz(s) { s = s.slice(0, 44); while (s.length < 44) s += '<'; return s; }
+
+  // The stamp's centre word must stay inside its inner ring (ОДОБРЕНО is wider than VALIDÉ).
+  function fitStampWord() {
+    var w = $('visa-word');
+    w.removeAttribute('textLength');
+    w.removeAttribute('lengthAdjust');
+    try {
+      if (w.getComputedTextLength() > 52) { w.setAttribute('textLength', '52'); w.setAttribute('lengthAdjust', 'spacingAndGlyphs'); }
+    } catch (e) {}
+  }
+
+  function renderPass() {
+    var s = saved, yes = s.coming === 'yes';
+    $('pass-title').textContent = yes ? t('passYes', s.name) : t('passNo', s.name);
+    $('visa-stamp').style.display = yes ? '' : 'none';
+    fitStampWord();
+    $('p-name').textContent = s.name;
+    Array.prototype.forEach.call(document.querySelectorAll('#pass .yes-row'), function (el) { el.hidden = !yes; });
+    var c = s.code && BY_CODE[s.code];
+    if (yes) {
+      $('p-party').textContent = t('people', (s.plusOnes || 0) + 1);
+      $('p-country').textContent = (c ? flag(c) + ' ' + countryName(c, lang) : '🌍 ' + (s.custom || ''));
+      $('p-dish').textContent = s.dish || t('dishTbd');
+    }
+    var details = yes && s.details ? s.details : '';
+    $('p-where-row').hidden = !details;
+    $('p-where').textContent = details ? t('station') + '\n' + details : '';
+    $('pass-meta').textContent = [dayMonth(CFG.date), CFG.startTime ? localTime(CFG.startTime) : '', t('station')]
+      .filter(Boolean).join(' · ');
+    var text = yes ? t('passYesText') : t('passNoText');
+    if (yes && !details) text += ' ' + t('addressLater');
+    if (!s.sent) text = t('unsent');
+    $('pass-text').textContent = text;
+    $('mrz1').textContent = padMrz('V<BKL' + mrz(s.name));
+    $('mrz2').textContent = padMrz((yes ? 'P' + ((s.plusOnes || 0) + 1) : 'P0') + '<<' + (c ? mrz(s.code) : mrz(s.custom || 'XXX')) + '<<2610317' + (CFG.startTime ? CFG.startTime.replace(':', '') : ''));
+  }
+
+  // ── Country combobox ──
+  var activeIndex = -1, options = [];
+  function openList() {
+    var input = $('f-country');
+    var list = $('country-list');
+    var text = input.value.trim();
+    var results = searchCountries(text).slice(0, text ? 60 : 300);
+    options = results.map(function (r) { return { code: r.c.code, label: r.name, c: r.c }; });
+    var exact = exactCountry(text);
+    if (text && !exact) options.push({ custom: text, label: t('useCustom', text) });
+    list.textContent = '';
+    options.forEach(function (o, i) {
+      var li = document.createElement('li');
+      li.id = 'opt-' + i;
+      li.setAttribute('role', 'option');
+      li.setAttribute('aria-selected', 'false');
+      if (o.custom) li.className = 'custom';
+      var f = document.createElement('span');
+      f.className = 'f';
+      f.setAttribute('aria-hidden', 'true');
+      f.textContent = o.custom ? '✎' : flag(o.c);
+      var name = document.createElement('span');
+      name.textContent = o.label;
+      li.appendChild(f); li.appendChild(name);
+      if (!o.custom && takenInfo(o.code)) {
+        var tag = document.createElement('span');
+        tag.className = 'tag';
+        tag.textContent = t('onMap');
+        li.appendChild(tag);
+      }
+      li.addEventListener('mousedown', function (e) { e.preventDefault(); });
+      li.addEventListener('click', function () { choose(i); });
+      list.appendChild(li);
+    });
+    activeIndex = text && options.length ? 0 : -1;
+    highlight();
+    list.hidden = options.length === 0;
+    input.setAttribute('aria-expanded', String(!list.hidden));
+  }
+  function closeList() {
+    $('country-list').hidden = true;
+    $('f-country').setAttribute('aria-expanded', 'false');
+    $('f-country').removeAttribute('aria-activedescendant');
+    activeIndex = -1;
+  }
+  function highlight() {
+    var items = $('country-list').children;
+    for (var i = 0; i < items.length; i++) items[i].setAttribute('aria-selected', String(i === activeIndex));
+    if (activeIndex >= 0 && items[activeIndex]) {
+      $('f-country').setAttribute('aria-activedescendant', items[activeIndex].id);
+      var el = items[activeIndex], box = $('country-list');
+      if (el.offsetTop < box.scrollTop) box.scrollTop = el.offsetTop;
+      else if (el.offsetTop + el.offsetHeight > box.scrollTop + box.clientHeight) box.scrollTop = el.offsetTop + el.offsetHeight - box.clientHeight;
+    } else {
+      $('f-country').removeAttribute('aria-activedescendant');
+    }
+  }
+  function choose(i) {
+    var o = options[i];
+    if (!o) return;
+    country = o.custom ? { custom: o.custom } : { code: o.code };
+    $('f-country').value = labelFor(country);
+    closeList();
+    clearError('country');
+    renderCountryInput();
+  }
+  function resolveTypedCountry() {
+    var text = $('f-country').value.trim();
+    if (!text) { country = null; renderCountryInput(); return; }
+    if (country && labelFor(country) === text) return;
+    var exact = exactCountry(text);
+    country = exact ? { code: exact.code } : { custom: text };
+    if (exact) $('f-country').value = labelFor(country);
+    renderCountryInput();
+  }
+
+  // ── Form helpers ──
+  function currentComing() {
+    var checked = document.querySelector('input[name="coming"]:checked');
+    return checked ? checked.value : '';
+  }
+  function setError(field, msg) {
+    var p = $('e-' + field), wrap = $('fld-' + field);
+    p.textContent = msg; p.hidden = !msg;
+    if (wrap) wrap.classList.toggle('invalid', !!msg);
+    var input = field === 'name' ? $('f-name') : field === 'country' ? $('f-country') : null;
+    if (input) input.setAttribute('aria-invalid', String(!!msg));
+  }
+  function clearError(field) { setError(field, ''); }
+
+  function collect() {
+    var c = country;
+    return {
+      name: $('f-name').value.trim().replace(/\s+/g, ' '),
+      coming: currentComing(),
+      plusOnes: plus,
+      code: c && c.code ? c.code : '',
+      custom: c && !c.code ? c.custom : '',
+      dish: $('f-dish').value.trim(),
+      note: $('f-note').value.trim()
+    };
+  }
+  function validate(d) {
+    var first = null;
+    setError('name', d.name ? '' : t('errName'));
+    if (!d.name) first = first || $('f-name');
+    setError('coming', d.coming ? '' : t('errComing'));
+    if (!d.coming) first = first || document.querySelector('input[name="coming"]');
+    var needCountry = d.coming === 'yes' && !d.code && !d.custom;
+    setError('country', needCountry ? t('errCountry') : '');
+    if (needCountry) first = first || $('f-country');
+    return first;
+  }
+  function fillForm(s) {
+    $('f-name').value = s.name || '';
+    Array.prototype.forEach.call(document.querySelectorAll('input[name="coming"]'), function (r) { r.checked = r.value === s.coming; });
+    plus = Math.min(CFG.maxPlusOnes, s.plusOnes || 0);
+    country = s.code ? { code: s.code } : (s.custom ? { custom: s.custom } : null);
+    $('f-country').value = labelFor(country);
+    $('f-dish').value = s.dish || '';
+    $('f-note').value = s.note || '';
+    renderPlus();
+    renderCountryInput();
+  }
+  function payload(d) {
+    var c = d.code && BY_CODE[d.code];
+    return {
+      id: guestId(),
+      name: d.name,
+      coming: d.coming,
+      plusOnes: d.coming === 'yes' ? d.plusOnes : 0,
+      code: d.coming === 'yes' ? d.code : '',
+      country: d.coming === 'yes' ? (c ? countryName(c, lang) : d.custom) : '',
+      countryHost: d.coming === 'yes' ? (c ? countryName(c, CFG.hostLang || 'en') : d.custom) : '',
+      dish: d.coming === 'yes' ? d.dish : '',
+      note: d.note,
+      lang: lang,
+      website: $('f-website').value
+    };
+  }
+  function messageText(d) {
+    var lines = [t('fbHello'), t('pGuest') + ': ' + d.name, d.coming === 'yes' ? t('fbYes') : t('fbNo')];
+    if (d.coming === 'yes') {
+      var c = d.code && BY_CODE[d.code];
+      lines.push(t('pParty') + ': ' + t('people', (d.plusOnes || 0) + 1));
+      lines.push(t('pCountry') + ': ' + (c ? flag(c) + ' ' + countryName(c, lang) : d.custom));
+      if (d.dish) lines.push(t('pDish') + ': ' + d.dish);
+    }
+    if (d.note) lines.push(d.note);
+    return lines.join('\n');
+  }
+  function showFallback(d) {
+    $('fb-msg').textContent = messageText(d);
+    $('fb-share').hidden = !navigator.share;
+    $('fallback').hidden = false;
+  }
+
+  // ── Network: Google Apps Script web app. text/plain keeps it a "simple" CORS request ──
+  function api(method, body, query) {
+    var ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, 25000);
+    var params = (query ? query + '&' : '') + '_=' + Date.now();
+    var url = CFG.endpoint + (CFG.endpoint.indexOf('?') >= 0 ? '&' : '?') + params;
+    var opts = { method: method, redirect: 'follow', credentials: 'omit', signal: ctrl ? ctrl.signal : undefined };
+    if (body) { opts.body = JSON.stringify(body); opts.headers = { 'Content-Type': 'text/plain;charset=utf-8' }; }
+    return fetch(url, opts).then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    }).then(function (data) {
+      clearTimeout(timer);
+      if (!data || !data.ok) throw new Error((data && data.error) || 'bad_response');
+      return data;
+    }, function (err) { clearTimeout(timer); throw err; });
+  }
+
+  function setSummary(s) { if (s) { summary = s; renderChips(); renderCountryInput(); } }
+
+  function finish(d, sent, details) {
+    saved = Object.assign({}, d, { sent: sent, details: details || '', at: Date.now() });
+    if (saved.coming !== 'yes') { saved.plusOnes = 0; saved.code = ''; saved.custom = ''; saved.dish = ''; }
+    store.set(K_RSVP, saved);
+    editing = false;
+    notice = '';
+    renderRsvp();
+    var pass = $('pass');
+    if (pass.scrollIntoView) pass.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function setBusy(on) {
+    busy = on;
+    $('submit').disabled = on;
+    $('submit').textContent = on ? t('sending') : (saved ? t('update') : t('send'));
+  }
+
+  function submit(e) {
+    e.preventDefault();
+    if (busy) return;
+    if (!$('country-list').hidden) closeList();
+    if (currentComing() === 'yes') resolveTypedCountry();
+    var d = collect();
+    var firstInvalid = validate(d);
+    var status = $('status');
+    status.textContent = ''; status.className = 'status';
+    if (firstInvalid) { firstInvalid.focus(); return; }
+    delete $('fallback').dataset.forced;
+    $('fallback').hidden = true;
+    if (!CFG.endpoint) { finish(d, false, ''); return; }
+    setBusy(true);
+    api('POST', payload(d)).then(function (res) {
+      setBusy(false);
+      setSummary(res.summary);
+      finish(d, true, res.details);
+    }).catch(function () {
+      setBusy(false);
+      status.textContent = t('errSend');
+      status.className = 'status error';
+      $('fallback').dataset.forced = '1';
+      showFallback(d);
+    });
+  }
+
+  function refreshFromServer() {
+    if (!CFG.endpoint) return;
+    if (saved && !saved.sent) {
+      // Answer was saved while the list was offline: send it now, quietly.
+      api('POST', payload(saved)).then(function (res) {
+        setSummary(res.summary);
+        saved.sent = true; saved.details = res.details || '';
+        store.set(K_RSVP, saved);
+        renderRsvp();
+      }).catch(function () {});
+      return;
+    }
+    var query = saved ? 'id=' + encodeURIComponent(guestId()) : '';
+    api('GET', null, query).then(function (res) {
+      setSummary(res.summary);
+      if (saved && res.known === false) {
+        notice = 'lost';
+        editing = true;
+        fillForm(saved);
+        renderRsvp();
+      } else if (saved && typeof res.details === 'string' && res.details !== saved.details) {
+        saved.details = res.details;
+        store.set(K_RSVP, saved);
+        renderRsvp();
+      }
+    }).catch(function () {});
+  }
+
+  // ── Events ──
+  Array.prototype.forEach.call(document.querySelectorAll('.langs button'), function (b) {
+    b.addEventListener('click', function () {
+      lang = b.getAttribute('data-lang');
+      store.set(K_LANG, lang);
+      try {
+        var u = new URL(location.href);
+        u.searchParams.set('lang', lang);
+        history.replaceState(null, '', u.toString());
+      } catch (e) {}
+      if (!$('country-list').hidden) openList();
+      Array.prototype.forEach.call(document.querySelectorAll('.err:not([hidden])'), function (p) {
+        var field = p.id.slice(2);
+        setError(field, t(field === 'name' ? 'errName' : field === 'coming' ? 'errComing' : 'errCountry'));
+      });
+      if (!$('fallback').hidden && $('fallback').dataset.forced) showFallback(collect());
+      if ($('status').className.indexOf('error') >= 0) $('status').textContent = t('errSend');
+      applyLang();
+    });
+  });
+
+  Array.prototype.forEach.call(document.querySelectorAll('input[name="coming"]'), function (r) {
+    r.addEventListener('change', function () {
+      clearError('coming');
+      $('yes-fields').hidden = currentComing() !== 'yes';
+    });
+  });
+  $('f-name').addEventListener('input', function () { if (this.value.trim()) clearError('name'); });
+  $('plus-dec').addEventListener('click', function () { plus = Math.max(0, plus - 1); renderPlus(); });
+  $('plus-inc').addEventListener('click', function () { plus = Math.min(CFG.maxPlusOnes, plus + 1); renderPlus(); });
+
+  var countryInput = $('f-country');
+  countryInput.addEventListener('focus', function () {
+    openList();
+    var self = this;
+    if (window.matchMedia && window.matchMedia('(max-width: 640px)').matches) {
+      setTimeout(function () { self.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 250);
+    }
+  });
+  countryInput.addEventListener('input', function () {
+    country = null;
+    $('country-flag').textContent = '🌍';
+    $('country-taken').hidden = true;
+    clearError('country');
+    openList();
+  });
+  countryInput.addEventListener('keydown', function (e) {
+    var open = !$('country-list').hidden;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (!open) openList();
+      activeIndex = Math.min(options.length - 1, activeIndex + 1); highlight();
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      activeIndex = Math.max(0, activeIndex - 1); highlight();
+    } else if (e.key === 'Enter') {
+      if (open && activeIndex >= 0) { e.preventDefault(); choose(activeIndex); }
+    } else if (e.key === 'Escape') {
+      if (open) { e.preventDefault(); closeList(); }
+    } else if (e.key === 'Tab') {
+      closeList();
+    }
+  });
+  countryInput.addEventListener('blur', function () {
+    setTimeout(function () {
+      if (document.activeElement === countryInput) return;
+      closeList();
+      resolveTypedCountry();
+    }, 150);
+  });
+  document.addEventListener('click', function (e) {
+    if (!$('fld-country').contains(e.target)) closeList();
+  });
+
+  $('form').addEventListener('submit', submit);
+  $('change').addEventListener('click', function () {
+    editing = true;
+    notice = '';
+    fillForm(saved);
+    renderRsvp();
+    $('f-name').focus();
+  });
+  $('keep').addEventListener('click', function () {
+    editing = false;
+    renderRsvp();
+    $('pass').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+  $('fb-copy').addEventListener('click', function () {
+    var text = $('fb-msg').textContent, btn = this;
+    var done = function () { btn.textContent = t('copied'); setTimeout(function () { btn.textContent = t('copy'); }, 2000); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, function () { selectText($('fb-msg')); });
+    } else {
+      selectText($('fb-msg'));
+    }
+  });
+  $('fb-share').addEventListener('click', function () {
+    navigator.share({ text: $('fb-msg').textContent }).catch(function () {});
+  });
+  function selectText(el) {
+    var range = document.createRange();
+    range.selectNodeContents(el);
+    var sel = window.getSelection();
+    sel.removeAllRanges(); sel.addRange(range);
+  }
+
+  // ── Go ──
+  if (saved) fillForm(saved);
+  applyLang();
+  refreshFromServer();
+})();
+</script>
+</body>
+</html>
