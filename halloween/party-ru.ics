@@ -1,0 +1,27 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//secondbrain//halloween-party//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:halloween-2026-10-31@ovchinnikovav97-byte.github.io
+DTSTAMP:20261010T080703Z
+DTSTART;VALUE=DATE:20261031
+DTEND;VALUE=DATE:20261101
+SUMMARY:🎃 Хэллоуин вокруг света · день рожд
+ ения Виктории
+DESCRIPTION:Костюм страны (или культуры)\, кото
+ рую представляешь\, и одно блюдо оттуда. 
+ Всё ставим на один большой стол и пробуе
+ м вместе.\nАдрес пришлю лично.\nhttps://ovchinnikov
+ av97-byte.github.io/app/halloween/
+LOCATION:Париж
+URL:https://ovchinnikovav97-byte.github.io/app/halloween/
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Завтра Хэллоуин вокруг света. Кост
+ юм и блюдо готовы?
+TRIGGER:-PT15H
+END:VALARM
+END:VEVENT
+END:VCALENDAR

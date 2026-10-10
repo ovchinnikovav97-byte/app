@@ -1,0 +1,24 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//secondbrain//halloween-party//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:halloween-2026-10-31@ovchinnikovav97-byte.github.io
+DTSTAMP:20261010T080703Z
+DTSTART;VALUE=DATE:20261031
+DTEND;VALUE=DATE:20261101
+SUMMARY:🎃 Halloween around the world · Viktoriia’s birthday
+DESCRIPTION:Come as a country (or a culture you love) and bring one dish fr
+ om there. We put everything on one big table and taste it together.\nThe a
+ ddress comes in a personal message.\nhttps://ovchinnikovav97-byte.github.i
+ o/app/halloween/
+LOCATION:Paris
+URL:https://ovchinnikovav97-byte.github.io/app/halloween/
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Tomorrow: Halloween around the world. Costume and dish ready?
+TRIGGER:-PT15H
+END:VALARM
+END:VEVENT
+END:VCALENDAR
