@@ -18,7 +18,7 @@ const TEXT = {
   en: {
     summary: `The Eye of Siberia · ${cfg.host.en}’s Birthday Expedition`,
     description: 'An original role-playing game: The Black Tears of Baikal.\n' +
-      'Dress as one country of your choice. Bring your favourite dish to share on the long journey.\n' +
+      'Dress as one country of your choice. Bring your favourite dish from that country to share on the long journey.\n' +
       (cfg.startTime ? `The convoy departs at ${at.en(cfg.startTime)} sharp. ` : '') +
       `Boarding point: Listvyanka Station, ${city('en')}. The exact address comes once your visa is validated.`,
     alarm: 'Tomorrow the convoy departs for Baikal. Costume and dish ready?'
@@ -26,7 +26,7 @@ const TEXT = {
   fr: {
     summary: `L’Œil de la Sibérie · l’expédition d’anniversaire de ${cfg.host.fr}`,
     description: 'Un jeu de rôle original : Les Larmes noires du Baïkal.\n' +
-      'Habillez-vous en un pays de votre choix. Apportez votre plat préféré à partager pendant le long voyage.\n' +
+      'Habillez-vous en un pays de votre choix. Apportez votre plat préféré de ce pays, à partager pendant le long voyage.\n' +
       (cfg.startTime ? `Le convoi part à ${at.fr(cfg.startTime)} précises. ` : '') +
       `Point d’embarquement : gare de Listvianka, ${city('fr')}. L’adresse exacte vous parviendra une fois votre visa validé.`,
     alarm: 'Demain, le convoi part pour le Baïkal. Costume et plat prêts ?'
@@ -34,7 +34,7 @@ const TEXT = {
   ru: {
     summary: `Око Сибири · экспедиция на день рождения ${cfg.host.ruGen}`,
     description: 'Авторская ролевая игра «Чёрные слёзы Байкала».\n' +
-      'Наряд одной страны на ваш выбор. Возьмите любимое блюдо, чтобы разделить его в долгой дороге.\n' +
+      'Наряд одной страны на ваш выбор. Возьмите любимое блюдо этой страны, чтобы разделить его в долгой дороге.\n' +
       (cfg.startTime ? `Конвой отправляется ровно в ${at.ru(cfg.startTime)}. ` : '') +
       `Место посадки: станция Листвянка, ${city('ru')}. Точный адрес пришлём после оформления визы.`,
     alarm: 'Завтра конвой отправляется на Байкал. Костюм и блюдо готовы?'

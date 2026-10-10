@@ -5,16 +5,16 @@ CALSCALE:GREGORIAN
 METHOD:PUBLISH
 BEGIN:VEVENT
 UID:halloween-2026-10-31@ovchinnikovav97-byte.github.io
-DTSTAMP:20261010T084546Z
+DTSTAMP:20261010T090411Z
 DTSTART:20261031T180000Z
 DTEND:20261031T230000Z
 SUMMARY:L’Œil de la Sibérie · l’expédition d’anniversaire de Vika
 DESCRIPTION:Un jeu de rôle original : Les Larmes noires du Baïkal.\nHabil
- lez-vous en un pays de votre choix. Apportez votre plat préféré à part
- ager pendant le long voyage.\nLe convoi part à 19h précises. Point d’e
- mbarquement : gare de Listvianka\, Villejuif. L’adresse exacte vous parv
- iendra une fois votre visa validé.\nhttps://ovchinnikovav97-byte.github.i
- o/app/halloween/
+ lez-vous en un pays de votre choix. Apportez votre plat préféré de ce p
+ ays\, à partager pendant le long voyage.\nLe convoi part à 19h précises
+ . Point d’embarquement : gare de Listvianka\, Villejuif. L’adresse exa
+ cte vous parviendra une fois votre visa validé.\nhttps://ovchinnikovav97-
+ byte.github.io/app/halloween/
 LOCATION:Villejuif
 URL:https://ovchinnikovav97-byte.github.io/app/halloween/
 BEGIN:VALARM

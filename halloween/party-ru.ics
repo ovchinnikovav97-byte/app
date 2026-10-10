@@ -5,19 +5,19 @@ CALSCALE:GREGORIAN
 METHOD:PUBLISH
 BEGIN:VEVENT
 UID:halloween-2026-10-31@ovchinnikovav97-byte.github.io
-DTSTAMP:20261010T084546Z
+DTSTAMP:20261010T090411Z
 DTSTART:20261031T180000Z
 DTEND:20261031T230000Z
 SUMMARY:Око Сибири · экспедиция на день рожд
  ения Вики
 DESCRIPTION:Авторская ролевая игра «Чёрные сл
  ёзы Байкала».\nНаряд одной страны на ваш 
- выбор. Возьмите любимое блюдо\, чтобы раз
- делить его в долгой дороге.\nКонвой отпра
- вляется ровно в 19:00. Место посадки: станц
- ия Листвянка\, Вильжюиф. Точный адрес при
- шлём после оформления визы.\nhttps://ovchinnikovav9
- 7-byte.github.io/app/halloween/
+ выбор. Возьмите любимое блюдо этой стран
+ ы\, чтобы разделить его в долгой дороге.\n
+ Конвой отправляется ровно в 19:00. Место по
+ садки: станция Листвянка\, Вильжюиф. Точн
+ ый адрес пришлём после оформления визы.\n
+ https://ovchinnikovav97-byte.github.io/app/halloween/
 LOCATION:Вильжюиф
 URL:https://ovchinnikovav97-byte.github.io/app/halloween/
 BEGIN:VALARM
