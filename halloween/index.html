@@ -340,6 +340,9 @@
   }
   .mrz span { display: block; }
   .pass-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+  .visa-cal { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0 0 14px; }
+  .visa-cal > span { grid-column: 1 / -1; font: 700 11px/1.3 var(--sans); letter-spacing: .22em; text-transform: uppercase; color: var(--ink-soft); }
+  #p-where a { color: var(--wine); text-decoration-thickness: 1px; text-underline-offset: 3px; }
 
   .fallback { margin: 20px 0 0; padding: 16px; border: 1.5px dashed var(--wine); }
   .fallback h3 { margin: 0 0 6px; color: var(--wine); font: italic 700 20px/1.2 var(--serif); }
@@ -827,6 +830,11 @@
           <p class="visa-meta" id="pass-meta"></p>
           <p class="visa-text" id="pass-text"></p>
           <div class="mrz" aria-hidden="true"><span id="mrz1"></span><span id="mrz2"></span></div>
+          <div class="visa-cal" id="visa-cal" hidden>
+            <span data-t="calendar">Add to calendar</span>
+            <a class="btn btn-ghost btn-sm" id="visa-cal-google" href="#" target="_blank" rel="noopener" data-t="calGoogle">Google</a>
+            <button type="button" class="btn btn-ghost btn-sm" id="visa-cal-ics" data-t="calApple">Apple · Outlook</button>
+          </div>
           <div class="pass-actions">
             <button type="button" class="btn btn-ghost btn-sm" id="change" data-t="change">Change my answer</button>
           </div>
@@ -1003,6 +1011,7 @@
       passNo: function (name) { return 'We’ll miss you, ' + name; },
       passYesText: 'Your visa is registered with the agency.',
       addressLater: function () { return H('en') + ' will send you the exact address personally.'; },
+      calAlarm: 'Tomorrow the convoy departs for Baikal. Costume and dish ready?',
       passNoText: 'Thank you for letting the agency know. If your plans change, you can update your visa here.',
       unsent: function () { return 'Send this answer to ' + H('en') + ' in a message so she can add you to the passenger list.'; },
       pGuest: 'Traveller', pParty: 'Party of', pCountry: 'Representing', pDish: 'Dish for the journey', pWhere: 'Boarding point',
@@ -1066,6 +1075,7 @@
       passNo: function (name) { return 'Vous allez nous manquer, ' + name; },
       passYesText: 'Votre visa est enregistré auprès de l’agence.',
       addressLater: function () { return H('fr') + ' vous enverra l’adresse exacte personnellement.'; },
+      calAlarm: 'Demain, le convoi part pour le Baïkal. Costume et plat prêts' + NB + '?',
       passNoText: 'Merci d’avoir prévenu l’agence. Si vos plans changent, vous pouvez mettre à jour votre visa ici.',
       unsent: function () { return 'Envoyez cette réponse à ' + H('fr') + ' par message pour qu’elle vous ajoute à la liste des passagers.'; },
       pGuest: 'Voyageur', pParty: 'Nombre de voyageurs', pCountry: 'Pays', pDish: 'Plat pour le voyage', pWhere: 'Point d’embarquement',
@@ -1129,6 +1139,7 @@
       passNo: function (name) { return 'Будем скучать, ' + name; },
       passYesText: 'Ваша виза зарегистрирована в агентстве.',
       addressLater: function () { return 'Точный адрес ' + CFG.host.ru + ' пришлёт лично.'; },
+      calAlarm: 'Завтра конвой отправляется на Байкал. Костюм и блюдо готовы?',
       passNoText: 'Спасибо, что предупредили агентство. Если планы изменятся, визу можно обновить здесь.',
       unsent: function () { return 'Пришлите этот ответ ' + CFG.host.ruDat + ' сообщением, чтобы она внесла вас в список пассажиров.'; },
       pGuest: 'Путешественник', pParty: 'Сколько вас', pCountry: 'Страна', pDish: 'Блюдо в дорогу', pWhere: 'Место посадки',
@@ -1295,7 +1306,80 @@
   function addDay(iso) { return new Date(utc(iso) + 86400000).toISOString().slice(0, 10); }
   function localTime(t) { return lang === 'en' ? enTime(t) : lang === 'fr' ? frTime(t) : t; }
 
-  function googleCalendarUrl() {
+  // Private details from the sheet script: first line = street address, the rest = door notes.
+  function splitDetails(details) {
+    var lines = String(details || '').split(/\r?\n/).map(function (l) { return l.trim(); }).filter(Boolean);
+    return { address: lines[0] || '', notes: lines.slice(1) };
+  }
+  function eventInfo(details) {
+    var d = splitDetails(details);
+    return {
+      location: d.address || CFG.address || CFG.city[lang] || CFG.city.en,
+      lines: d.address ? [t('station') + ': ' + d.address].concat(d.notes) : []
+    };
+  }
+  function eventDescription(info) {
+    return [t('game') + ' ' + t('gameTitle'),
+      t('dress1a') + ' ' + t('dress1b') + ' ' + t('dress2a') + ' ' + t('dress2b'),
+      t('depTime', CFG.startTime)].concat(info.lines).concat([CFG.pageUrl]).join('\n');
+  }
+  // Local party time → UTC milliseconds (handles the end of summer time).
+  function partyMs(dateIso, time) {
+    var guess = Date.parse(dateIso + 'T' + time + ':00Z');
+    try {
+      var parts = new Intl.DateTimeFormat('en-GB', { timeZone: CFG.timeZone, hourCycle: 'h23', year: 'numeric', month: '2-digit',
+        day: '2-digit', hour: '2-digit', minute: '2-digit' }).formatToParts(new Date(guess));
+      var get = function (type) { return parts.filter(function (p) { return p.type === type; })[0].value; };
+      var shown = Date.parse(get('year') + '-' + get('month') + '-' + get('day') + 'T' + get('hour') + ':' + get('minute') + ':00Z');
+      return guess - (shown - guess);
+    } catch (e) { return guess - 3600000; }
+  }
+  function icsEsc(v) { return String(v).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\r?\n/g, '\\n'); }
+  function icsStamp(ms) { return new Date(ms).toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, ''); }
+  function icsFold(line) {
+    var enc = window.TextEncoder ? new TextEncoder() : null, out = [], cur = '', size = 0;
+    Array.from(line).forEach(function (ch) {
+      var n = enc ? enc.encode(ch).length : (ch.charCodeAt(0) > 127 ? 3 : 1);
+      if (size + n > 75) { out.push(cur); cur = ' '; size = 1; }
+      cur += ch; size += n;
+    });
+    out.push(cur);
+    return out.join('\r\n');
+  }
+  function buildIcs(info) {
+    var when;
+    if (CFG.startTime) {
+      var start = partyMs(CFG.date, CFG.startTime);
+      var end = CFG.endTime
+        ? partyMs(CFG.endTime <= CFG.startTime ? addDay(CFG.date) : CFG.date, CFG.endTime)
+        : start + 5 * 3600000;
+      when = ['DTSTART:' + icsStamp(start), 'DTEND:' + icsStamp(end)];
+    } else {
+      when = ['DTSTART;VALUE=DATE:' + CFG.date.replace(/-/g, ''), 'DTEND;VALUE=DATE:' + addDay(CFG.date).replace(/-/g, '')];
+    }
+    // Same UID as the public party-*.ics, newer SEQUENCE: calendars update the event instead of duplicating it.
+    var lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//secondbrain//halloween-party//EN', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH',
+      'BEGIN:VEVENT', 'UID:halloween-' + CFG.date + '@ovchinnikovav97-byte.github.io', 'SEQUENCE:1', 'DTSTAMP:' + icsStamp(Date.now())]
+      .concat(when)
+      .concat(['SUMMARY:' + icsEsc(t('eye') + ' · ' + t('expedition')), 'DESCRIPTION:' + icsEsc(eventDescription(info)),
+        'LOCATION:' + icsEsc(info.location), 'URL:' + CFG.pageUrl,
+        'BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:' + icsEsc(t('calAlarm')), CFG.startTime ? 'TRIGGER:-P1D' : 'TRIGGER:-PT15H', 'END:VALARM',
+        'END:VEVENT', 'END:VCALENDAR']);
+    return lines.map(icsFold).join('\r\n') + '\r\n';
+  }
+  function downloadIcs(text) {
+    var url = URL.createObjectURL(new Blob([text], { type: 'text/calendar;charset=utf-8' }));
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'baikal-expedition.ics';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
+  }
+
+  function googleCalendarUrl(info) {
+    info = info || eventInfo('');
     var d = CFG.date.replace(/-/g, '');
     var dates;
     if (CFG.startTime) {
@@ -1314,13 +1398,12 @@
     } else {
       dates = d + '/' + addDay(CFG.date).replace(/-/g, '');
     }
-    var details = t('game') + ' ' + t('gameTitle') + '\n' + t('dress1a') + ' ' + t('dress1b') + ' ' +
-      t('dress2a') + ' ' + t('dress2b') + '\n' + t('depTime', CFG.startTime) + '\n' + CFG.pageUrl;
+    var details = eventDescription(info);
     return 'https://calendar.google.com/calendar/render?action=TEMPLATE' +
       '&text=' + encodeURIComponent(t('eye') + ' · ' + t('expedition')) +
       '&dates=' + dates + (CFG.startTime ? '&ctz=' + encodeURIComponent(CFG.timeZone) : '') +
       '&details=' + encodeURIComponent(details) +
-      '&location=' + encodeURIComponent(CFG.address || CFG.city[lang] || CFG.city.en);
+      '&location=' + encodeURIComponent(info.location);
   }
 
   // ── Rendering ──
@@ -1487,7 +1570,21 @@
     }
     var details = yes && s.details ? s.details : '';
     $('p-where-row').hidden = !details;
-    $('p-where').textContent = details ? t('station') + '\n' + details : '';
+    var where = $('p-where');
+    where.textContent = '';
+    if (details) {
+      var dd = splitDetails(details);
+      where.appendChild(document.createTextNode(t('station') + '\n'));
+      var map = document.createElement('a');
+      map.href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(dd.address);
+      map.target = '_blank';
+      map.rel = 'noopener';
+      map.textContent = dd.address;
+      where.appendChild(map);
+      if (dd.notes.length) where.appendChild(document.createTextNode('\n' + dd.notes.join('\n')));
+    }
+    $('visa-cal').hidden = !yes;
+    if (yes) $('visa-cal-google').href = googleCalendarUrl(eventInfo(details));
     $('pass-meta').textContent = [dayMonth(CFG.date), CFG.startTime ? localTime(CFG.startTime) : '', t('station')]
       .filter(Boolean).join(' · ');
     var text = yes ? t('passYesText') : t('passNoText');
@@ -1837,6 +1934,10 @@
     editing = false;
     renderRsvp();
     $('pass').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+  $('visa-cal-ics').addEventListener('click', function () {
+    if (!saved || saved.coming !== 'yes') return;
+    downloadIcs(buildIcs(eventInfo(saved.details)));
   });
   $('fb-copy').addEventListener('click', function () {
     var text = $('fb-msg').textContent, btn = this;
